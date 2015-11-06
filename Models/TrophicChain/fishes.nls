@@ -1,0 +1,29 @@
+
+;;
+; fishes.nls : fishes related procedures
+;;
+
+
+
+;;
+; Spatial update of fishes
+to move-fishes
+  
+end
+
+
+
+;;
+; eating phase
+to eat-fishes
+
+
+end
+
+
+
+;;
+; reproduction phase
+to reproduce-fishes
+  
+end

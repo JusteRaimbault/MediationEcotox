@@ -1,0 +1,19 @@
+
+;;;
+;; ressources.nls
+;;;
+
+
+
+;;
+; some ressources can move (ex daphnies, insects)
+to move-ressources
+  
+end
+
+
+;;
+; renewal
+to renew-ressources
+  
+end

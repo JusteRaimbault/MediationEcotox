@@ -1,0 +1,32 @@
+
+
+;;;
+; main
+;;;
+
+
+;;
+; Go for one cycle of the ecosystem
+to go
+  
+  ; make agents evolve in space
+  ;  -> an other implementation of theses functions is possible in gaming version
+  move-fishes
+  move-ressources
+  
+  ; fishes do eat
+  eat-fishes
+  
+  ; and reproduce
+  reproduce-fishes
+  
+  ; finally ressources do renew
+  renew-ressources
+  
+  ; external events can occur at the end of a cycle
+  ; (either top-down or bottom-up events)
+  ;  Note : check time scales, may have in game several 'automatic' ticks to have time to stabilize (stationarity) the dynamic (and thus take it into account)
+  ;      to do that, make events occur at some stages only.
+  external-events
+  
+end

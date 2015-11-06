@@ -1,0 +1,78 @@
+
+;; setup
+
+
+
+to setup
+  
+  ;; general
+  setup-global
+  
+  ;; aquatic environment
+  setup-environment
+  
+  ;; species
+  setup-species
+  
+  ;; ressources within the environment
+  setup-ressources
+  
+  
+end
+
+
+to setup-global
+  
+end
+
+
+to setup-environment
+  
+  ; built-in vars
+  let surface-color pink
+  let water-color blue
+  let ground-color yellow
+  
+  ; read zones size from setup file
+  let env-zones read-table "setup/environment.tab" ":"
+
+  ; 3 zones --> TODO Generic number of zones ?
+  let surface-height read-from-string table:get env-zones "surface"
+  ask patches with [pycor > max-pycor - surface-height] [set pcolor surface-color]
+  let water-height read-from-string table:get env-zones "water"
+  ask patches with [pycor <= max-pycor - surface-height and pycor > max-pycor - surface-height - water-height] [set pcolor water-color]
+  let ground-height read-from-string table:get env-zones "ground"
+  ask patches with [pycor <= max-pycor - surface-height - water-height] [set pcolor ground-color]
+  
+end
+
+
+to setup-species
+  
+  ; globals vars
+  set species-names read-file "setup/species.txt"
+  set #-species length species-names
+  
+  ; trophic matrices
+  ; (no check, assume consistency)
+  set trophic-matrix read-numeric-csv-as-matrix "setup/trophic-matrix.csv" ";"
+  set trophic-energy-matrix read-numeric-csv-as-matrix "setup/trophic-energy-matrix.csv" ";"
+  
+  
+end
+
+
+to setup-ressources
+  
+  set ressources-names read-file "setup/ressources.txt"
+  set #-ressources length ressources-names
+  
+  set ressources-matrix read-numeric-csv-as-matrix "setup/ressources-matrix.csv" ";"
+  
+end
+
+
+
+
+
+
