@@ -69,6 +69,10 @@ to setup-ressources
   
   set ressources-matrix read-numeric-csv-as-matrix "setup/ressources-matrix.csv" ";"
   
+  let raw-ressources-shapes-and-color "setup/ressources-shapes.csv"
+  set ressources-shapes table:make
+  ; requirement : nrow(ressources) == nrow
+  
 end
 
 
