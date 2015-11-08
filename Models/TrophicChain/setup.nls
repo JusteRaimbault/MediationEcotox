@@ -5,6 +5,8 @@
 
 to setup
   
+  init-setup
+  
   ;; general
   setup-global
   
@@ -21,7 +23,19 @@ to setup
 end
 
 
+;;
+;
+to init-setup
+  clear-all
+  reset-ticks
+  
+end
+
+
 to setup-global
+  
+  ;set initial-ressources 10
+  
   
 end
 
@@ -34,7 +48,7 @@ to setup-environment
   let ground-color yellow
   
   ; read zones size from setup file
-  let env-zones read-table "setup/environment.tab" ":"
+  let env-zones read-table "setup/environment.tab" ":" ;(task [show ? report ?])
 
   ; 3 zones --> TODO Generic number of zones ?
   let surface-height read-from-string table:get env-zones "surface"
@@ -59,6 +73,20 @@ to setup-species
   set trophic-energy-matrix read-numeric-csv-as-matrix "setup/trophic-energy-matrix.csv" ";"
   
   
+  ; shapes (no color for species ?)
+  let raw-species-shapes read-file "setup/species-shapes.csv"
+  set species-shapes table:make
+  let i 0 foreach species-names [table:put species-shapes (list ? "shape") (item i raw-species-shapes) set i i + 1]
+  
+  
+  
+  ;; setup fishes
+  foreach species-names [
+    let name ?
+    create-fishes (initial-fishes / 2 + random (initial-fishes / 2)) [new-fish name]  
+  ]
+  
+  
 end
 
 
@@ -69,14 +97,24 @@ to setup-ressources
   
   set ressources-matrix read-numeric-csv-as-matrix "setup/ressources-matrix.csv" ";"
   
-  let raw-ressources-shapes-and-color "setup/ressources-shapes.csv"
+  let raw-ressources-shapes-and-color map [explode ";" ?] (read-file "setup/ressources-shapes.csv")
   set ressources-shapes table:make
-  ; requirement : nrow(ressources) == nrow
+  ; requirement : nrow(ressources) == nrow(ressources shapes)
+  let i 0 foreach ressources-names [table:put ressources-shapes (list ? "shape") (item 0 (item i raw-ressources-shapes-and-color)) table:put ressources-shapes (list ? "color") (item 1 (item i raw-ressources-shapes-and-color)) set i i + 1]
+  
+  set ressources-spatial-constraints read-table "setup/ressources-spatial-constraints.tab" ":" ;(task [report map read-from-string (explode ";" ?)])
+  foreach table:keys ressources-spatial-constraints [table:put ressources-spatial-constraints ? (map read-from-string (explode ";" (table:get ressources-spatial-constraints ?)))]
+  
+  ; setup ressources in themselves
+  foreach ressources-names [
+     let name ?
+     create-ressources (initial-ressources / 2 + random (initial-ressources / 2)) [
+       new-ressource name
+     ]
+  ]
+  
   
 end
-
-
-
 
 
 

@@ -17,8 +17,22 @@ end
 ; eating phase
 to eat-fishes
 
+  ; first ressources are eaten (convention)
+  eat-ressources
+  
+  ; then fishes eat themselves
 
 end
+
+
+to eat-ressources
+  ask fishes [
+    if count ((ressources in-radius ressource-eating-radius) with [member? ressource-type-index eaten-ressources]) > 0 [
+    
+    ]
+  ]
+end
+
 
 
 
@@ -27,3 +41,29 @@ end
 to reproduce-fishes
   
 end
+
+
+to new-fish [name]
+  set species name set underbreed name
+  set species-index position name species-names
+  new-underbreeded-agent species-shapes
+  set size 2
+  move-to fishes-initial-patch
+  
+  ; fixed parameters (for now)
+  set ressource-eating-radius 4
+  set eaten-ressources []
+  let i 0 foreach matrix:get-row ressources-matrix species-index [if ? > 0 [set eaten-ressources lput i eaten-ressources] set i i + 1]
+  
+end
+
+;;
+; initial patches within feasible area for this species
+to-report fishes-initial-patch
+  report one-of patches
+end
+
+
+
+
+

@@ -37,6 +37,8 @@ globals [
   ; associated energy gain matrix (some fishes may eat a lot others but low quality food ? --> check thematically this assumption ; anyway matrix can be identity)
   trophic-energy-matrix
   
+  species-shapes
+  
   ;;;;
   ;; Ressources related
   ;;;;
@@ -55,6 +57,11 @@ globals [
   ; table : (species name,shape) -> shape ; (species name,color) -> color
   ;  -> associated with a generic 'give-shape procedure' ?
   ressources-shapes
+  
+  ressources-spatial-constraints
+  
+  ;; initial number of ressources when random
+  ;initial-ressources
   
 ]
 
@@ -76,9 +83,16 @@ turtles-own [
 fishes-own [
   
   species
+  species-index
 
   ; an agent consists in a group of individuals
-  #-fishes 
+  #-fishes
+  
+  
+  ressource-eating-radius
+  
+  ; list of indexes of eaten ressources
+  eaten-ressources
   
 ]
 
@@ -86,6 +100,7 @@ fishes-own [
 ressources-own [
   
   ressource-type
+  ressource-type-index
    
 ]
 @#$#@#$#@
@@ -149,6 +164,54 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+8
+128
+138
+161
+initial-ressources
+initial-ressources
+0
+100
+63
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+165
+138
+198
+initial-fishes
+initial-fishes
+0
+20
+10
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+1019
+19
+1431
+292
+stocks
+time
+populations
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"ressources" 1.0 0 -15040220 true "" "plot count ressources"
 
 @#$#@#$#@
 ## WHAT IS IT?

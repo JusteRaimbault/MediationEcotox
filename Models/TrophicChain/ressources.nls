@@ -17,3 +17,26 @@ end
 to renew-ressources
   
 end
+
+
+
+
+
+
+;;
+;  Report initial patch for ressource given constraints
+;  (depends on ressource type) -> express constraints as (ressource-type) -> [max-pycor ; min-pycor]
+to-report ressource-initial-patch
+  let spatial-constraint table:get ressources-spatial-constraints ressource-type 
+  report one-of patches with [count ressources-here = 0 and pycor <= (item 0 spatial-constraint) and pycor >= (item 1 spatial-constraint)]
+end
+
+
+
+
+to new-ressource [name]
+  set ressource-type name set underbreed name
+  set ressource-type-index position name ressources-names
+  new-underbreeded-agent ressources-shapes
+  move-to ressource-initial-patch
+end

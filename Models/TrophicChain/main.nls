@@ -29,6 +29,8 @@ to go
   ;      to do that, make events occur at some stages only.
   external-events
   
+  tick
+  
 end
 
 
