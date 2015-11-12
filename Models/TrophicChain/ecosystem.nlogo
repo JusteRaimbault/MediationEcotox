@@ -90,9 +90,19 @@ fishes-own [
   
   
   ressource-eating-radius
+  fish-interaction-radius
   
   ; list of indexes of eaten ressources
   eaten-ressources
+  
+  ; list of indexes of eaten fishes
+  eaten-fishes
+  
+  ; energy : if 0 dies
+  energy
+  
+  ; reproduced -> if the fish has already reproduced
+  reproduced?
   
 ]
 
@@ -154,7 +164,7 @@ BUTTON
 145
 95
 go
-go
+if count fishes = 0 or count ressources = 0 [stop]\ngo
 T
 1
 T
@@ -174,7 +184,7 @@ initial-ressources
 initial-ressources
 0
 100
-63
+76
 1
 1
 NIL
@@ -189,7 +199,7 @@ initial-fishes
 initial-fishes
 0
 20
-10
+20
 1
 1
 NIL
@@ -212,6 +222,70 @@ true
 "" ""
 PENS
 "ressources" 1.0 0 -15040220 true "" "plot count ressources"
+"fishes" 1.0 0 -8053223 true "" "plot count fishes"
+
+SLIDER
+6
+201
+138
+234
+initial-fish-energy
+initial-fish-energy
+0
+100
+10
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+1019
+297
+1347
+531
+energy
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"total-energy" 1.0 0 -7500403 true "" "plot sum [energy] of fishes"
+
+SLIDER
+3
+272
+153
+305
+fish-moving-cost
+fish-moving-cost
+0
+1
+0.06
+0.005
+1
+NIL
+HORIZONTAL
+
+SLIDER
+4
+309
+153
+342
+reproduction-cost
+reproduction-cost
+0
+10
+4
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

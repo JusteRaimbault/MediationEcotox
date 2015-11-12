@@ -8,9 +8,21 @@
 ;;
 ; Spatial update of fishes
 to move-fishes
-  
+  ask fishes[
+    wander 
+  ]
 end
 
+;;
+; fish procedure for movement
+;   - may implement different moving strategies
+to wander
+  ; random wandering
+  rt random 360
+  fd 1
+  ; looses energy when moves
+  set energy energy - fish-moving-cost
+end
 
 
 ;;
@@ -21,26 +33,57 @@ to eat-fishes
   eat-ressources
   
   ; then fishes eat themselves
+  eat-other-fishes
 
 end
 
 
 to eat-ressources
   ask fishes [
-    if count ((ressources in-radius ressource-eating-radius) with [member? ressource-type-index eaten-ressources]) > 0 [
-    
+    let surrounding-eaten-ressources ((ressources in-radius ressource-eating-radius) with [member? ressource-type-index [eaten-ressources] of myself])
+    if count surrounding-eaten-ressources > 0 [
+      ; eat it
+      ; TODO : variable number of eaten and energy gained
+      ask one-of surrounding-eaten-ressources [die] set energy energy + 1
     ]
   ]
 end
 
+to eat-other-fishes
+  ; lets do that at random : a simple ask fish should mix species uniformally, so that a chain A -> B -> C may be broken in the middle or done entierely, in an uniform way, quite logical.
+  ask fishes [
+    let surrounding-eaten-fishes ((fishes in-radius fish-interaction-radius) with [member? species-index [eaten-fishes] of myself])
+    if count surrounding-eaten-fishes > 0 [
+      ask one-of surrounding-eaten-fishes [die] set energy energy + 1 
+    ] 
+  ]
+  
+end
 
 
 
 ;;
 ; reproduction phase
 to reproduce-fishes
+  ; simple for now : reproduce with same species fishes in radius eating-radius (==> interaction-radius)
+  ask fishes [set reproduced? false]
   
+  ask fishes [
+    ; potential mates have to have enough energy to reproduce (no suicide to have sex !)
+    let potential-mates ((other fishes in-radius fish-interaction-radius) with [not reproduced? and species-index = [species-index] of myself and energy > reproduction-cost])
+    if count potential-mates > 0 and energy > reproduction-cost [
+      set reproduced? true set energy energy - reproduction-cost ask one-of potential-mates [set reproduced? true set energy energy - reproduction-cost] hatch 1 [set reproduced? true set energy initial-fish-energy]
+    ]
+  ]
 end
+
+
+;;
+; dying phase
+to check-fishes-survival
+  ask fishes with [energy <= 0][die]
+end
+
 
 
 to new-fish [name]
@@ -51,9 +94,20 @@ to new-fish [name]
   move-to fishes-initial-patch
   
   ; fixed parameters (for now)
+  
+  ; TODO : may be optimzed, global variable as list, get value by species index, only var owned by fishes ?
+  
   set ressource-eating-radius 4
+  ; eaten ressources
   set eaten-ressources []
   let i 0 foreach matrix:get-row ressources-matrix species-index [if ? > 0 [set eaten-ressources lput i eaten-ressources] set i i + 1]
+  
+  set fish-interaction-radius 4
+  set eaten-fishes []
+  set i 0 foreach matrix:get-row trophic-matrix species-index [if ? > 0 [set eaten-fishes lput i eaten-fishes] set i i + 1]
+  
+  ; initial energy : crucial parameter as should determine short-term collapse of the ecosystem
+  set energy initial-fish-energy
   
 end
 

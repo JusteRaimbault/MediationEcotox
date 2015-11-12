@@ -20,6 +20,9 @@ to go
   ; and reproduce
   reproduce-fishes
   
+  ; die if necessary
+  check-fishes-survival
+  
   ; finally ressources do renew
   renew-ressources
   
