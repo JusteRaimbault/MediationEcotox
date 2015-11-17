@@ -8,6 +8,7 @@ __includes [
   "fishes.nls"
   "ressources.nls"
   "external.nls"
+  "indicators.nls"
   
   ;; Utils
   
@@ -101,8 +102,12 @@ fishes-own [
   ; energy : if 0 dies
   energy
   
-  ; reproduced -> if the fish has already reproduced
+  ; reproduced -> if the fish has already reproduced at this step
+  ;  Q : needed if use var age ? Y
   reproduced?
+  
+  ; age of the fish, needed to determine reproduction/natural death
+  birth-date
   
 ]
 
@@ -115,9 +120,9 @@ ressources-own [
 ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-162
+158
 15
-1012
+1008
 680
 24
 18
@@ -199,7 +204,7 @@ initial-fishes
 initial-fishes
 0
 20
-20
+19
 1
 1
 NIL
@@ -233,7 +238,7 @@ initial-fish-energy
 initial-fish-energy
 0
 100
-10
+9
 1
 1
 NIL
@@ -266,7 +271,7 @@ fish-moving-cost
 fish-moving-cost
 0
 1
-0.06
+0.08
 0.005
 1
 NIL
@@ -281,11 +286,111 @@ reproduction-cost
 reproduction-cost
 0
 10
-4
+1.5
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+6
+381
+137
+414
+max-fish-age
+max-fish-age
+0
+10000
+2586
 1
 1
 NIL
 HORIZONTAL
+
+SLIDER
+3
+419
+147
+452
+fish-maturation-age
+fish-maturation-age
+0
+100
+33
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+1018
+545
+1075
+590
+fishes
+count fishes
+17
+1
+11
+
+MONITOR
+1078
+545
+1134
+590
+birthday
+mean [birth-date] of fishes
+17
+1
+11
+
+SLIDER
+6
+468
+148
+501
+#-wandering-moves
+#-wandering-moves
+0
+10
+5
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+-7
+503
+159
+536
+wandering-step-distance
+wandering-step-distance
+0
+10
+3
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+1190
+539
+1390
+689
+species
+time
+#-species
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -14462382 true "" "plot current-#-species"
 
 @#$#@#$#@
 ## WHAT IS IT?

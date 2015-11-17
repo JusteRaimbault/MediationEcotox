@@ -32,11 +32,13 @@ end
 ;
 to init-setup
   clear-all
+  reset-ticks
 end
 
 to finish-setup
   ; better to reset ticks at the end of setup (for plots setup)
-  reset-ticks
+  ; issue with reset-ticks and fishes initialization
+  ;reset-ticks
 end
 
 to setup-global
@@ -90,7 +92,7 @@ to setup-species
   ;; setup fishes
   foreach species-names [
     let name ?
-    create-fishes (initial-fishes / 2 + random (initial-fishes / 2)) [new-fish name]  
+    create-fishes (initial-fishes / 2 + random (initial-fishes / 2)) [new-fish name true]  
   ]
   
   

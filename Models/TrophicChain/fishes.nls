@@ -18,9 +18,12 @@ end
 ;   - may implement different moving strategies
 to wander
   ; random wandering
-  rt random 360
-  fd 1
+  repeat #-wandering-moves [
+    rt random 360
+    fd wandering-step-distance
+  ]
   ; looses energy when moves
+  ; (moving cost by tick -> not normalized by wandering-step-distance * #-wandering-moves :: TODO ? )
   set energy energy - fish-moving-cost
 end
 
@@ -68,11 +71,11 @@ to reproduce-fishes
   ; simple for now : reproduce with same species fishes in radius eating-radius (==> interaction-radius)
   ask fishes [set reproduced? false]
   
-  ask fishes [
+  ask fishes with [(ticks - birth-date) > fish-maturation-age] [
     ; potential mates have to have enough energy to reproduce (no suicide to have sex !)
-    let potential-mates ((other fishes in-radius fish-interaction-radius) with [not reproduced? and species-index = [species-index] of myself and energy > reproduction-cost])
+    let potential-mates ((other fishes in-radius fish-interaction-radius) with [(ticks - birth-date) > fish-maturation-age and not reproduced? and species-index = [species-index] of myself and energy > reproduction-cost])
     if count potential-mates > 0 and energy > reproduction-cost [
-      set reproduced? true set energy energy - reproduction-cost ask one-of potential-mates [set reproduced? true set energy energy - reproduction-cost] hatch 1 [set reproduced? true set energy initial-fish-energy]
+      set reproduced? true set energy energy - reproduction-cost ask one-of potential-mates [set reproduced? true set energy energy - reproduction-cost] hatch 1 [new-fish species false]
     ]
   ]
 end
@@ -81,33 +84,50 @@ end
 ;;
 ; dying phase
 to check-fishes-survival
+  
+  ; make fishes age ? -> no need, use date-of-birth instead
+  ; kill old fishes
+  ask fishes with [(ticks - birth-date) > max-fish-age][die]
+  
+  ; kill fishes with no energy
   ask fishes with [energy <= 0][die]
 end
 
 
 
-to new-fish [name]
-  set species name set underbreed name
-  set species-index position name species-names
-  new-underbreeded-agent species-shapes
-  set size 2
-  move-to fishes-initial-patch
+to new-fish [name initial?]
   
-  ; fixed parameters (for now)
   
-  ; TODO : may be optimzed, global variable as list, get value by species index, only var owned by fishes ?
+  ifelse initial? [
   
-  set ressource-eating-radius 4
-  ; eaten ressources
-  set eaten-ressources []
-  let i 0 foreach matrix:get-row ressources-matrix species-index [if ? > 0 [set eaten-ressources lput i eaten-ressources] set i i + 1]
+    set species name set underbreed name
+    set species-index position name species-names
+    new-underbreeded-agent species-shapes
+    set size 2
+    move-to fishes-initial-patch
   
-  set fish-interaction-radius 4
-  set eaten-fishes []
-  set i 0 foreach matrix:get-row trophic-matrix species-index [if ? > 0 [set eaten-fishes lput i eaten-fishes] set i i + 1]
+    ; fixed parameters (for now)
+  
+    ; TODO : may be optimzed, global variable as list, get value by species index, only var owned by fishes ?
+  
+    set ressource-eating-radius 4
+    ; eaten ressources
+    set eaten-ressources []
+    let i 0 foreach matrix:get-row ressources-matrix species-index [if ? > 0 [set eaten-ressources lput i eaten-ressources] set i i + 1]
+  
+    set fish-interaction-radius 4
+    set eaten-fishes []
+    set i 0 foreach matrix:get-row trophic-matrix species-index [if ? > 0 [set eaten-fishes lput i eaten-fishes] set i i + 1]
+  
+  ][
+     set reproduced? true
+  ]
   
   ; initial energy : crucial parameter as should determine short-term collapse of the ecosystem
   set energy initial-fish-energy
+  
+  ; date of birth
+  set birth-date ticks
   
 end
 
