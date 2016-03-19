@@ -46,6 +46,9 @@ to setup-global
   ;set initial-ressources 10
   
   
+  ;; indicators
+  set species-count []
+  
 end
 
 
@@ -73,17 +76,17 @@ end
 to setup-species
   
   ; globals vars
-  set species-names read-file "setup/species.txt"
+  set species-names read-file (word "setup/" setup-dir "/species.txt")
   set #-species length species-names
   
   ; trophic matrices
   ; (no check, assume consistency)
-  set trophic-matrix read-numeric-csv-as-matrix "setup/trophic-matrix.csv" ";"
-  set trophic-energy-matrix read-numeric-csv-as-matrix "setup/trophic-energy-matrix.csv" ";"
+  set trophic-matrix read-numeric-csv-as-matrix (word "setup/" setup-dir "/trophic-matrix.csv") ";"
+  set trophic-energy-matrix read-numeric-csv-as-matrix (word "setup/" setup-dir "/trophic-energy-matrix.csv") ";"
   
   
   ; shapes (no color for species ?)
-  let raw-species-shapes map [explode ";" ?] (read-file "setup/species-shapes.csv")
+  let raw-species-shapes map [explode ";" ?] (read-file (word "setup/" setup-dir "/species-shapes.csv"))
   set species-shapes table:make
   let i 0 foreach species-names [table:put species-shapes (list ? "shape") (item 0 (item i raw-species-shapes)) table:put species-shapes (list ? "color") (item 1 (item i raw-species-shapes)) set i i + 1]
   
@@ -101,17 +104,17 @@ end
 
 to setup-ressources
   
-  set ressources-names read-file "setup/ressources.txt"
+  set ressources-names read-file (word "setup/" setup-dir "/ressources.txt")
   set #-ressources length ressources-names
   
-  set ressources-matrix read-numeric-csv-as-matrix "setup/ressources-matrix.csv" ";"
+  set ressources-matrix read-numeric-csv-as-matrix (word "setup/" setup-dir "/ressources-matrix.csv") ";"
   
-  let raw-ressources-shapes-and-color map [explode ";" ?] (read-file "setup/ressources-shapes.csv")
+  let raw-ressources-shapes-and-color map [explode ";" ?] (read-file (word "setup/" setup-dir "/ressources-shapes.csv"))
   set ressources-shapes table:make
   ; requirement : nrow(ressources) == nrow(ressources shapes)
   let i 0 foreach ressources-names [table:put ressources-shapes (list ? "shape") (item 0 (item i raw-ressources-shapes-and-color)) table:put ressources-shapes (list ? "color") (item 1 (item i raw-ressources-shapes-and-color)) set i i + 1]
   
-  set ressources-spatial-constraints read-table "setup/ressources-spatial-constraints.tab" ":" ;(task [report map read-from-string (explode ";" ?)])
+  set ressources-spatial-constraints read-table (word "setup/" setup-dir "/ressources-spatial-constraints.tab") ":" ;(task [report map read-from-string (explode ";" ?)])
   foreach table:keys ressources-spatial-constraints [table:put ressources-spatial-constraints ? (map read-from-string (explode ";" (table:get ressources-spatial-constraints ?)))]
   
   ; setup ressources in themselves

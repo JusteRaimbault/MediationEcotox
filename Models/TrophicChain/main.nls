@@ -32,6 +32,8 @@ to go
   ;      to do that, make events occur at some stages only.
   external-events
   
+  update-vars
+  
   tick
   
 end
@@ -47,4 +49,11 @@ end
 to new-underbreeded-agent [shapes-table]
   if table:has-key? shapes-table (list underbreed "shape") [set shape table:get shapes-table (list underbreed "shape") ]
   if table:has-key? shapes-table (list underbreed "color") [let color-string table:get shapes-table (list underbreed "color") run (word "set color " color-string)]
+end
+
+
+
+to update-vars
+  
+  set species-count lput current-populations species-count
 end

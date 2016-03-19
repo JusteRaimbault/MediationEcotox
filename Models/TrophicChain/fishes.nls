@@ -23,8 +23,8 @@ to wander
     fd wandering-step-distance
   ]
   ; looses energy when moves
-  ; (moving cost by tick -> not normalized by wandering-step-distance * #-wandering-moves :: TODO ? )
-  set energy energy - fish-moving-cost
+  ; (moving cost by tick and by spatial unit)
+  set energy energy - (fish-moving-cost * wandering-step-distance)
 end
 
 
@@ -46,7 +46,7 @@ to eat-ressources
     let surrounding-eaten-ressources ((ressources in-radius ressource-eating-radius) with [member? ressource-type-index [eaten-ressources] of myself])
     if count surrounding-eaten-ressources > 0 [
       ; eat it
-      ; TODO : variable number of eaten and energy gained
+      ;   variable number of eaten and energy gained ? -> ressources-energy-matrix
       ask one-of surrounding-eaten-ressources [die] set energy energy + 1
     ]
   ]
@@ -124,7 +124,9 @@ to new-fish [name initial?]
   ]
   
   ; initial energy : crucial parameter as should determine short-term collapse of the ecosystem
-  set energy initial-fish-energy
+  ;set energy initial-fish-energy
+  ; Convention : E_0 = 1 ; other parameters all in units of E_0
+  set energy 1
   
   ; date of birth
   set birth-date ticks

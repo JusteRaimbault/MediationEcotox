@@ -15,6 +15,14 @@ end
 ;;
 ; renewal
 to renew-ressources
+  ; simple rule of ressources renewal : random ressources appear at a fixed rate
+  foreach ressources-names [
+     let name ?
+     create-ressources (ressource-renewal-rate / 2 + random (ressource-renewal-rate / 2)) [
+       new-ressource name
+     ]
+  ]
+  
   
 end
 

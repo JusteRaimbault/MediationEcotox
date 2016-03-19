@@ -10,9 +10,12 @@ __includes [
   "external.nls"
   "indicators.nls"
   
+  ;; calibration -> headless model
+  "experiment.nls"
+  
   ;; Utils
   
-  "../../../Softwares/NetLogo/utils/io/File.nls"
+  "utils/File.nls"
   
 ]
 
@@ -63,6 +66,14 @@ globals [
   
   ;; initial number of ressources when random
   ;initial-ressources
+  
+  
+  ;;;;
+  ;; indicators
+  ;;;;
+  
+  ;; list of species number at each time step
+  species-count
   
 ]
 
@@ -147,10 +158,10 @@ ticks
 30.0
 
 BUTTON
+15
 22
-62
-77
-95
+70
+55
 NIL
 setup
 NIL
@@ -164,10 +175,10 @@ NIL
 1
 
 BUTTON
-82
-62
-145
-95
+75
+22
+138
+55
 go
 if count fishes = 0 or count ressources = 0 [stop]\ngo
 T
@@ -182,9 +193,9 @@ NIL
 
 SLIDER
 8
-128
+158
 138
-161
+191
 initial-ressources
 initial-ressources
 0
@@ -197,14 +208,14 @@ HORIZONTAL
 
 SLIDER
 8
-165
+195
 138
-198
+228
 initial-fishes
 initial-fishes
 0
 20
-19
+10
 1
 1
 NIL
@@ -228,21 +239,6 @@ true
 PENS
 "ressources" 1.0 0 -15040220 true "" "plot count ressources"
 "fishes" 1.0 0 -8053223 true "" "plot count fishes"
-
-SLIDER
-6
-201
-138
-234
-initial-fish-energy
-initial-fish-energy
-0
-100
-9
-1
-1
-NIL
-HORIZONTAL
 
 PLOT
 1019
@@ -270,9 +266,9 @@ SLIDER
 fish-moving-cost
 fish-moving-cost
 0
-1
-0.08
-0.005
+0.1
+0.0075
+0.0005
 1
 NIL
 HORIZONTAL
@@ -285,9 +281,9 @@ SLIDER
 reproduction-cost
 reproduction-cost
 0
-10
-1.5
 0.1
+0.0085
+0.0005
 1
 NIL
 HORIZONTAL
@@ -295,13 +291,13 @@ HORIZONTAL
 SLIDER
 6
 381
-137
+145
 414
 max-fish-age
 max-fish-age
 0
-10000
-2586
+100
+40
 1
 1
 NIL
@@ -316,7 +312,7 @@ fish-maturation-age
 fish-maturation-age
 0
 100
-33
+5
 1
 1
 NIL
@@ -391,6 +387,31 @@ false
 "" ""
 PENS
 "default" 1.0 0 -14462382 true "" "plot current-#-species"
+
+CHOOSER
+8
+72
+146
+117
+setup-dir
+setup-dir
+"four-species" "two-species"
+1
+
+SLIDER
+-1
+580
+156
+613
+ressource-renewal-rate
+ressource-renewal-rate
+0
+100
+1
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

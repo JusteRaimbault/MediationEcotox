@@ -1,10 +1,25 @@
 
 ;; indicators
 
-
+;;
+; number of current species
+;   -> indicator of dynamic equilibrium at stopping time
 to-report current-#-species
   
   ; count ≠ names in underbreed names ? -> list unique.
   
   report 0
+end
+
+
+; list of species cardinals
+to-report current-populations
+  let res []
+  foreach species-names [set res lput (count fishes with [species = ?]) res]
+  report res
+end
+
+
+to-report all-time-species-balance
+  
 end
