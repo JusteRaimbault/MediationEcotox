@@ -1,5 +1,5 @@
 
-extensions [matrix table]
+extensions [matrix table gradient]
 
 __includes [
   
@@ -9,9 +9,14 @@ __includes [
   "ressources.nls"
   "external.nls"
   "indicators.nls"
+  "display.nls"
   
   ;; calibration -> headless model
   "experiment.nls"
+  
+  "interactive.nls"
+  
+  "events.nls"
   
   ;; Utils
   
@@ -69,11 +74,25 @@ globals [
   
   
   ;;;;
+  ;; environment
+  ;;;;
+  env-zones
+  
+  
+  ;;;;
   ;; indicators
   ;;;;
   
   ;; list of species number at each time step
   species-count
+  
+  
+  ;;;;
+  ;; events
+  ;;;;
+  
+  pollution-dilation-rate
+  
   
 ]
 
@@ -83,6 +102,14 @@ breed[fishes fish]
 
 ; idem for various natural ressources
 breed[ressources ressource]
+
+
+
+patches-own [
+ 
+  pollution
+  
+]
 
 
 turtles-own [
@@ -158,10 +185,10 @@ ticks
 30.0
 
 BUTTON
-15
-22
-70
-55
+28
+21
+83
+54
 NIL
 setup
 NIL
@@ -175,9 +202,9 @@ NIL
 1
 
 BUTTON
-75
+88
 22
-138
+143
 55
 go
 if count fishes = 0 or count ressources = 0 [stop]\ngo
@@ -200,7 +227,7 @@ initial-ressources
 initial-ressources
 0
 100
-76
+75
 1
 1
 NIL
@@ -215,7 +242,7 @@ initial-fishes
 initial-fishes
 0
 20
-10
+7
 1
 1
 NIL
@@ -267,7 +294,7 @@ fish-moving-cost
 fish-moving-cost
 0
 0.1
-0.0075
+0.0095
 0.0005
 1
 NIL
@@ -282,7 +309,7 @@ reproduction-cost
 reproduction-cost
 0
 0.1
-0.0085
+0.0285
 0.0005
 1
 NIL
@@ -312,7 +339,7 @@ fish-maturation-age
 fish-maturation-age
 0
 100
-5
+7
 1
 1
 NIL
@@ -364,7 +391,7 @@ wandering-step-distance
 wandering-step-distance
 0
 10
-3
+1
 1
 1
 NIL
@@ -389,10 +416,10 @@ PENS
 "default" 1.0 0 -14462382 true "" "plot current-#-species"
 
 CHOOSER
-8
-72
+10
+101
+148
 146
-117
 setup-dir
 setup-dir
 "four-species" "two-species"
@@ -407,11 +434,50 @@ ressource-renewal-rate
 ressource-renewal-rate
 0
 100
-1
+2
 1
 1
 NIL
 HORIZONTAL
+
+MONITOR
+1019
+599
+1077
+644
+balance
+all-time-species-balance
+17
+1
+11
+
+BUTTON
+52
+60
+107
+93
+NIL
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+14
+640
+141
+673
+interactive?
+interactive?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -779,6 +845,10 @@ Circle -16777216 true false 30 30 240
 Circle -7500403 true true 60 60 180
 Circle -16777216 true false 90 90 120
 Circle -7500403 true true 120 120 60
+
+test
+true
+0
 
 tree
 false

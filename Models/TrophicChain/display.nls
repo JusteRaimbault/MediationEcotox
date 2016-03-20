@@ -1,0 +1,32 @@
+
+
+;;
+; display
+
+
+to update-display
+  color-patches
+end
+
+
+to color-patches
+  ; built-in vars
+  let surface-color pink
+  let water-color blue
+  let ground-color yellow
+  
+  ; 3 zones --> TODO Generic number of zones ?
+  let surface-height read-from-string table:get env-zones "surface"
+  ask patches with [pycor > max-pycor - surface-height] [set pcolor surface-color]
+  let water-height read-from-string table:get env-zones "water"
+  ask patches with [pycor <= max-pycor - surface-height and pycor > max-pycor - surface-height - water-height] [set pcolor water-color]
+  let ground-height read-from-string table:get env-zones "ground"
+  ask patches with [pycor <= max-pycor - surface-height - water-height] [set pcolor ground-color]
+  
+  ; event related coloring
+  ask patches [
+    let current-color extract-rgb pcolor let colors (list current-color) set colors lput [0 255 0] colors
+    set pcolor gradient:scale colors pollution 0 1 
+  ]
+  
+end

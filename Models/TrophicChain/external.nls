@@ -5,5 +5,5 @@
 
 
 to external-events
-  
+  update-event-vars
 end

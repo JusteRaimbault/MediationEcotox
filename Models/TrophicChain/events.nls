@@ -1,0 +1,27 @@
+
+;; events
+
+
+
+
+to pollute
+  ask one-of patches [set pollution 1] repeat 5 [diffuse pollution 0.5]
+end
+
+
+
+
+
+to update-event-vars
+  
+  
+  update-pollution
+  
+  
+end
+
+
+to update-pollution
+  ask patches [set pollution pollution * (1 - pollution-dilation-rate)]
+  repeat 2 [diffuse pollution 0.5]
+end

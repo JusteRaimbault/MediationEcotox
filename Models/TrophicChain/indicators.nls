@@ -21,5 +21,11 @@ end
 
 
 to-report all-time-species-balance
-  
+  ; compute balance at each time and take mean
+  ;   take arbitrarly species one and take ratio p1 / (p1 + p2)
+  let res []
+  foreach species-count [
+     set res lput (first ? / (first ? + last ?)) res 
+  ]
+  ifelse res = [] [report 1][report 2 * (abs ((mean res) - 0.5))]
 end

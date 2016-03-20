@@ -1,0 +1,30 @@
+
+;;
+;  interactive playing
+
+
+
+to choose-wandering-zones
+  foreach species-names [
+     choose-wandering-zone ?
+  ]
+end
+
+
+to choose-wandering-zone [s]
+  user-message (word "select wandering center for species " s)
+  let selected false
+  while [not selected][
+    if mouse-down? [
+      
+      ; set global var
+      
+      if user-yes-or-no? (word "coordinates " mouse-xcor mouse-ycor " : ok ? ") [
+         set selected true   
+      ]
+       
+    ] 
+  ]
+end
+  
+  

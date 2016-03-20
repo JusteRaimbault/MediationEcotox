@@ -49,27 +49,17 @@ to setup-global
   ;; indicators
   set species-count []
   
+  set pollution-dilation-rate 0.05
+  
 end
 
 
 to setup-environment
   
-  ; built-in vars
-  let surface-color pink
-  let water-color blue
-  let ground-color yellow
-  
   ; read zones size from setup file
-  let env-zones read-table "setup/environment.tab" ":" ;(task [show ? report ?])
+  set env-zones read-table "setup/environment.tab" ":" ;(task [show ? report ?])
 
-  ; 3 zones --> TODO Generic number of zones ?
-  let surface-height read-from-string table:get env-zones "surface"
-  ask patches with [pycor > max-pycor - surface-height] [set pcolor surface-color]
-  let water-height read-from-string table:get env-zones "water"
-  ask patches with [pycor <= max-pycor - surface-height and pycor > max-pycor - surface-height - water-height] [set pcolor water-color]
-  let ground-height read-from-string table:get env-zones "ground"
-  ask patches with [pycor <= max-pycor - surface-height - water-height] [set pcolor ground-color]
-  
+  color-patches
 end
 
 
