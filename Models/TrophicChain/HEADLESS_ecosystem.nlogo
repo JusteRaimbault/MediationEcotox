@@ -1,5 +1,5 @@
 
-extensions [matrix table gradient]
+extensions [matrix table] ;gradient]
 
 __includes [
   
@@ -73,6 +73,10 @@ globals [
   ;initial-ressources
   
   
+  
+  fish-interaction-radius
+  ressource-eating-radius
+  
   ;;;;
   ;; environment
   ;;;;
@@ -93,6 +97,27 @@ globals [
   
   pollution-dilation-rate
   
+  
+  ;;;;
+  ;; experiments
+  ;;;;
+  
+  headless?
+  
+  max-ticks
+  
+  setup-dir
+  initial-ressources
+  initial-fishes
+  fish-moving-cost
+  reproduction-cost
+  max-fish-age
+  fish-maturation-age
+  energy-gain-from-ressources
+  energy-gain-from-fishes
+  #-wandering-moves
+  wandering-step-distance
+  ressource-renewal-rate
   
 ]
 
@@ -126,10 +151,6 @@ fishes-own [
 
   ; an agent consists in a group of individuals
   #-fishes
-  
-  
-  ressource-eating-radius
-  fish-interaction-radius
   
   ; list of indexes of eaten ressources
   eaten-ressources
@@ -185,12 +206,12 @@ ticks
 30.0
 
 BUTTON
-28
-21
-83
-54
-NIL
+11
+15
+71
+48
 setup
+ca\nsetup-headless\n
 NIL
 1
 T
@@ -202,10 +223,10 @@ NIL
 1
 
 BUTTON
-88
-22
-143
-55
+75
+58
+130
+91
 go
 if count fishes = 0 or count ressources = 0 [stop]\ngo
 T
@@ -217,36 +238,6 @@ NIL
 NIL
 NIL
 1
-
-SLIDER
-8
-158
-138
-191
-initial-ressources
-initial-ressources
-0
-100
-75
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-8
-195
-138
-228
-initial-fishes
-initial-fishes
-0
-20
-11
-1
-1
-NIL
-HORIZONTAL
 
 PLOT
 1019
@@ -285,66 +276,6 @@ false
 PENS
 "total-energy" 1.0 0 -7500403 true "" "plot sum [energy] of fishes"
 
-SLIDER
-3
-272
-153
-305
-fish-moving-cost
-fish-moving-cost
-0
-0.1
-0.02
-0.0005
-1
-NIL
-HORIZONTAL
-
-SLIDER
-4
-309
-153
-342
-reproduction-cost
-reproduction-cost
-0
-0.1
-0.0285
-0.0005
-1
-NIL
-HORIZONTAL
-
-SLIDER
-6
-381
-145
-414
-max-fish-age
-max-fish-age
-0
-100
-40
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-3
-419
-147
-452
-fish-maturation-age
-fish-maturation-age
-0
-100
-27
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
 1358
 299
@@ -367,36 +298,6 @@ mean [birth-date] of fishes
 1
 11
 
-SLIDER
-6
-468
-148
-501
-#-wandering-moves
-#-wandering-moves
-0
-10
-5
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
--7
-503
-159
-536
-wandering-step-distance
-wandering-step-distance
-0
-10
-2
-1
-1
-NIL
-HORIZONTAL
-
 PLOT
 1197
 298
@@ -415,31 +316,6 @@ false
 PENS
 "default" 1.0 0 -14462382 true "" "plot current-#-species"
 
-CHOOSER
-10
-101
-148
-146
-setup-dir
-setup-dir
-"four-species" "two-species"
-1
-
-SLIDER
--1
-580
-156
-613
-ressource-renewal-rate
-ressource-renewal-rate
-0
-100
-2
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
 1359
 353
@@ -452,10 +328,10 @@ all-time-species-balance
 11
 
 BUTTON
-52
-60
-107
-93
+14
+58
+69
+91
 NIL
 go
 NIL
@@ -467,17 +343,6 @@ NIL
 NIL
 NIL
 1
-
-SWITCH
-14
-640
-141
-673
-interactive?
-interactive?
-1
-1
--1000
 
 OUTPUT
 1019

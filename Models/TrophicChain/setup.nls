@@ -5,6 +5,8 @@
 
 to setup
   
+  output-print "Setup..."
+  
   init-setup
   
   ;; general
@@ -31,7 +33,7 @@ end
 ;;
 ;
 to init-setup
-  clear-all
+  if headless? != true [clear-all]
   reset-ticks
 end
 
@@ -56,6 +58,8 @@ end
 
 to setup-environment
   
+  output-print "..setup environment"
+  
   ; read zones size from setup file
   set env-zones read-table "setup/environment.tab" ":" ;(task [show ? report ?])
 
@@ -64,6 +68,8 @@ end
 
 
 to setup-species
+  
+  output-print "..setup species"
   
   ; globals vars
   set species-names read-file (word "setup/" setup-dir "/species.txt")
@@ -93,6 +99,8 @@ end
 
 
 to setup-ressources
+  
+  output-print "..setup ressources"
   
   set ressources-names read-file (word "setup/" setup-dir "/ressources.txt")
   set #-ressources length ressources-names

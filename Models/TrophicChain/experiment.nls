@@ -1,3 +1,57 @@
 
 ;; model calibration
 
+
+
+to setup-experiment [init-ressources init-fishes moving-cost reprod-cost max-age matur-age e-ressources e-fishes ressource-renew]
+  ; set experiment vars
+  
+  set initial-ressources init-ressources    ; \in [0,100]
+  set initial-fishes init-fishes   ; \in [0,40]
+  set fish-moving-cost moving-cost ; \in [0,1] ; J.m^-1
+  set reproduction-cost reprod-cost  ; \in [0,1] ; J
+  set max-fish-age max-age ; \in [0,100] ; ticks
+  set fish-maturation-age matur-age ; ticks
+  set energy-gain-from-ressources e-ressources
+  set energy-gain-from-fishes e-fishes
+  set ressource-renewal-rate ressource-renew
+  
+  setup-headless
+  
+end
+
+
+to setup-headless
+  
+  set headless? true
+  
+  set setup-dir "two-species"
+  
+  ;set initial-ressources 300    ; \in [0,100]
+  ;set initial-fishes 50   ; \in [0,40]
+  ;set fish-moving-cost 0 ; \in [0,1] ; J.m^-1
+  ;set reproduction-cost 1  ; \in [0,1] ; J
+  ;set max-fish-age 40  ; \in [0,100] ; ticks
+  ;set fish-maturation-age 5 ; ticks
+  ;set energy-gain-from-ressources 30
+  ;set energy-gain-from-fishes 20
+  ;set ressource-renewal-rate 4
+  
+  set #-wandering-moves 1    ; must be fixed as gives time step
+  set wandering-step-distance 1  ; idem
+  set fish-interaction-radius 1  ; fixed
+  set ressource-eating-radius 1  ; fixed
+  
+  set max-ticks 1000
+  
+  setup
+  
+end
+
+
+to run-experiment
+  repeat max-ticks [
+    if count fishes = 0 [stop]
+    go 
+  ]
+end

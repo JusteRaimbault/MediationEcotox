@@ -20,6 +20,10 @@ to wander
   ; random wandering
   repeat #-wandering-moves [
     rt random 360
+    
+    ;  TODO more clever wandering as space is stratified
+    
+    ;rt random 60 lt random 60
     fd wandering-step-distance
   ]
   ; looses energy when moves
@@ -47,7 +51,7 @@ to eat-ressources
     if count surrounding-eaten-ressources > 0 [
       ; eat it
       ;   variable number of eaten and energy gained ? -> ressources-energy-matrix
-      ask one-of surrounding-eaten-ressources [die] set energy energy + 1
+      ask one-of surrounding-eaten-ressources [die] set energy energy + energy-gain-from-ressources
     ]
   ]
 end
@@ -57,7 +61,7 @@ to eat-other-fishes
   ask fishes [
     let surrounding-eaten-fishes ((fishes in-radius fish-interaction-radius) with [member? species-index [eaten-fishes] of myself])
     if count surrounding-eaten-fishes > 0 [
-      ask one-of surrounding-eaten-fishes [die] set energy energy + 1 
+      ask one-of surrounding-eaten-fishes [die] set energy energy + energy-gain-from-fishes
     ] 
   ]
   
@@ -110,12 +114,10 @@ to new-fish [name initial?]
   
     ; TODO : may be optimzed, global variable as list, get value by species index, only var owned by fishes ?
   
-    set ressource-eating-radius 4
     ; eaten ressources
     set eaten-ressources []
     let i 0 foreach matrix:get-row ressources-matrix species-index [if ? > 0 [set eaten-ressources lput i eaten-ressources] set i i + 1]
   
-    set fish-interaction-radius 4
     set eaten-fishes []
     set i 0 foreach matrix:get-row trophic-matrix species-index [if ? > 0 [set eaten-fishes lput i eaten-fishes] set i i + 1]
   
@@ -125,8 +127,8 @@ to new-fish [name initial?]
   
   ; initial energy : crucial parameter as should determine short-term collapse of the ecosystem
   ;set energy initial-fish-energy
-  ; Convention : E_0 = 1 ; other parameters all in units of E_0
-  set energy 1
+  ;  CONSERVATION OF ENERGY : initial energy is exactly reproduction cost for each mate
+  set energy 2 * reproduction-cost  
   
   ; date of birth
   set birth-date ticks

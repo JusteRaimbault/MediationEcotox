@@ -24,9 +24,10 @@ to color-patches
   ask patches with [pycor <= max-pycor - surface-height - water-height] [set pcolor ground-color]
   
   ; event related coloring
-  ask patches [
-    let current-color extract-rgb pcolor let colors (list current-color) set colors lput [0 255 0] colors
-    set pcolor gradient:scale colors pollution 0 1 
-  ]
+  ;  issue with gradient extension : very slow
+  ;ask patches [
+  ;  let current-color extract-rgb pcolor let colors (list current-color) set colors lput [0 255 0] colors
+  ;  ;set pcolor gradient:scale colors pollution 0 1 
+  ;]
   
 end

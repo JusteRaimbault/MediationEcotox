@@ -29,3 +29,7 @@ to-report all-time-species-balance
   ]
   ifelse res = [] [report 1][report 2 * (abs ((mean res) - 0.5))]
 end
+
+to-report collapsed?
+  ifelse count fishes = 0 [report 1][report 0]
+end
