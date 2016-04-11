@@ -16,11 +16,11 @@ to color-patches
   let ground-color yellow
   
   ; 3 zones --> TODO Generic number of zones ?
-  let surface-height read-from-string table:get env-zones "surface"
+  let surface-height read-from-string table-get env-zones "surface"
   ask patches with [pycor > max-pycor - surface-height] [set pcolor surface-color]
-  let water-height read-from-string table:get env-zones "water"
+  let water-height read-from-string table-get env-zones "water"
   ask patches with [pycor <= max-pycor - surface-height and pycor > max-pycor - surface-height - water-height] [set pcolor water-color]
-  let ground-height read-from-string table:get env-zones "ground"
+  let ground-height read-from-string table-get env-zones "ground"
   ask patches with [pycor <= max-pycor - surface-height - water-height] [set pcolor ground-color]
   
   ; event related coloring

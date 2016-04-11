@@ -1,26 +1,28 @@
 
-extensions [matrix table] ;gradient]
+extensions [] ; matrix gradient]
 
 __includes [
   
-  "setup.nls"
-  "main.nls"
-  "fishes.nls"
-  "ressources.nls"
-  "external.nls"
-  "indicators.nls"
-  "display.nls"
+  "model/setup.nls"
+  "model/main.nls"
+  "model/fishes.nls"
+  "model/ressources.nls"
+  "model/external.nls"
+  "model/indicators.nls"
+  "model/display.nls"
   
   ;; calibration -> headless model
-  "experiment.nls"
+  "model/experiment.nls"
   
-  "interactive.nls"
+  "model/interactive.nls"
   
-  "events.nls"
+  "model/events.nls"
   
   ;; Utils
   
   "utils/File.nls"
+  
+  "utils/extensions.nls"
   
 ]
 
@@ -109,6 +111,7 @@ globals [
   setup-dir
   initial-ressources
   initial-fishes
+  initial-species-balance
   fish-moving-cost
   reproduction-cost
   max-fish-age
@@ -118,6 +121,7 @@ globals [
   #-wandering-moves
   wandering-step-distance
   ressource-renewal-rate
+  
   
 ]
 
@@ -192,7 +196,7 @@ GRAPHICS-WINDOW
 1
 1
 0
-0
+1
 0
 1
 -24
@@ -208,10 +212,10 @@ ticks
 BUTTON
 11
 15
-71
+107
 48
-setup
-ca\nsetup-headless\n
+setup-test
+ca\nsetup-experiment 100 50 0.45 0.01 1 1000 20 30 2 3\n
 NIL
 1
 T
@@ -239,94 +243,6 @@ NIL
 NIL
 1
 
-PLOT
-1019
-19
-1431
-292
-stocks
-time
-populations
-0.0
-10.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"ressources" 1.0 0 -15040220 true "" "plot count ressources"
-"fishes" 1.0 0 -8053223 true "" "plot count fishes"
-
-PLOT
-1019
-297
-1192
-469
-energy
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"total-energy" 1.0 0 -7500403 true "" "plot sum [energy] of fishes"
-
-MONITOR
-1358
-299
-1415
-344
-fishes
-count fishes
-17
-1
-11
-
-MONITOR
-1359
-405
-1415
-450
-birthday
-mean [birth-date] of fishes
-17
-1
-11
-
-PLOT
-1197
-298
-1357
-469
-species
-time
-#-species
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -14462382 true "" "plot current-#-species"
-
-MONITOR
-1359
-353
-1417
-398
-balance
-all-time-species-balance
-17
-1
-11
-
 BUTTON
 14
 58
@@ -343,13 +259,6 @@ NIL
 NIL
 NIL
 1
-
-OUTPUT
-1019
-487
-1390
-681
-10
 
 @#$#@#$#@
 ## WHAT IS IT?

@@ -1,26 +1,27 @@
 
-extensions [matrix table gradient]
+extensions [];matrix table gradient]
 
 __includes [
   
-  "setup.nls"
-  "main.nls"
-  "fishes.nls"
-  "ressources.nls"
-  "external.nls"
-  "indicators.nls"
-  "display.nls"
+  "model/setup.nls"
+  "model/main.nls"
+  "model/fishes.nls"
+  "model/ressources.nls"
+  "model/external.nls"
+  "model/indicators.nls"
+  "model/display.nls"
   
   ;; calibration -> headless model
-  "experiment.nls"
+  "model/experiment.nls"
   
-  "interactive.nls"
+  "model/interactive.nls"
   
-  "events.nls"
+  "model/events.nls"
   
   ;; Utils
   
   "utils/File.nls"
+  "utils/extensions.nls"
   
 ]
 
@@ -74,6 +75,15 @@ globals [
   
   
   ;;;;
+  ;; fishes
+  ;;;;
+  
+  ressource-eating-radius
+  fish-interaction-radius
+  
+  
+  
+  ;;;;
   ;; environment
   ;;;;
   env-zones
@@ -92,6 +102,14 @@ globals [
   ;;;;
   
   pollution-dilation-rate
+  
+  
+  ;;;;;
+  ;;  headless
+  ;;;;;
+  
+  headless?
+  max-ticks
   
   
 ]
@@ -128,9 +146,6 @@ fishes-own [
   #-fishes
   
   
-  ressource-eating-radius
-  fish-interaction-radius
-  
   ; list of indexes of eaten ressources
   eaten-ressources
   
@@ -158,10 +173,10 @@ ressources-own [
 ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-158
-15
-1008
-680
+166
+10
+1016
+675
 24
 18
 17.152
@@ -171,7 +186,7 @@ GRAPHICS-WINDOW
 1
 1
 0
-0
+1
 0
 1
 -24
@@ -226,8 +241,8 @@ SLIDER
 initial-ressources
 initial-ressources
 0
-100
-75
+200
+200
 1
 1
 NIL
@@ -241,8 +256,8 @@ SLIDER
 initial-fishes
 initial-fishes
 0
-20
-11
+200
+100
 1
 1
 NIL
@@ -264,8 +279,9 @@ true
 true
 "" ""
 PENS
-"ressources" 1.0 0 -15040220 true "" "plot count ressources"
-"fishes" 1.0 0 -8053223 true "" "plot count fishes"
+"fishes" 1.0 0 -2674135 true "" "plot count fishes"
+"species1" 1.0 0 -7500403 true "" "plot count fishes with [species-index = 0]"
+"species2" 1.0 0 -3844592 true "" "plot count fishes with [species-index = 1]"
 
 PLOT
 1019
@@ -287,14 +303,14 @@ PENS
 
 SLIDER
 3
-272
+291
 153
-305
+324
 fish-moving-cost
 fish-moving-cost
 0
 0.1
-0.02
+0.0105
 0.0005
 1
 NIL
@@ -302,54 +318,54 @@ HORIZONTAL
 
 SLIDER
 4
-309
+328
 153
-342
+361
 reproduction-cost
 reproduction-cost
 0
 0.1
-0.0285
+0.0815
 0.0005
 1
 NIL
 HORIZONTAL
 
 SLIDER
-6
-381
-145
-414
+10
+372
+149
+405
 max-fish-age
 max-fish-age
 0
-100
-40
+1000
+911
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-3
-419
-147
-452
+7
+410
+151
+443
 fish-maturation-age
 fish-maturation-age
 0
 100
-27
+12
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1358
-299
-1415
-344
+1223
+310
+1280
+355
 fishes
 count fishes
 17
@@ -357,10 +373,10 @@ count fishes
 11
 
 MONITOR
-1359
-405
-1415
-450
+1224
+416
+1280
+461
 birthday
 mean [birth-date] of fishes
 17
@@ -368,52 +384,34 @@ mean [birth-date] of fishes
 11
 
 SLIDER
-6
-468
-148
-501
+8
+568
+150
+601
 #-wandering-moves
 #-wandering-moves
 0
 10
-5
+1
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
--7
-503
-159
-536
+-5
+603
+161
+636
 wandering-step-distance
 wandering-step-distance
 0
 10
-2
+1
 1
 1
 NIL
 HORIZONTAL
-
-PLOT
-1197
-298
-1357
-469
-species
-time
-#-species
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -14462382 true "" "plot current-#-species"
 
 CHOOSER
 10
@@ -426,25 +424,25 @@ setup-dir
 1
 
 SLIDER
--1
-580
-156
-613
+4
+522
+161
+555
 ressource-renewal-rate
 ressource-renewal-rate
 0
 100
-2
+35
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1359
-353
-1417
-398
+1224
+364
+1282
+409
 balance
 all-time-species-balance
 17
@@ -485,6 +483,51 @@ OUTPUT
 1390
 681
 10
+
+SLIDER
+3
+447
+160
+480
+energy-gain-from-ressources
+energy-gain-from-ressources
+0
+10
+7.9
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+4
+483
+160
+516
+energy-gain-from-fishes
+energy-gain-from-fishes
+0
+10
+0.9
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+9
+236
+163
+269
+initial-species-balance
+initial-species-balance
+0
+1
+0.18
+0.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

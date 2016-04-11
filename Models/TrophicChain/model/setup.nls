@@ -53,6 +53,10 @@ to setup-global
   
   set pollution-dilation-rate 0.05
   
+  
+  set ressource-eating-radius 1
+  set fish-interaction-radius 1
+  
 end
 
 
@@ -83,15 +87,18 @@ to setup-species
   
   ; shapes (no color for species ?)
   let raw-species-shapes map [explode ";" ?] (read-file (word "setup/" setup-dir "/species-shapes.csv"))
-  set species-shapes table:make
-  let i 0 foreach species-names [table:put species-shapes (list ? "shape") (item 0 (item i raw-species-shapes)) table:put species-shapes (list ? "color") (item 1 (item i raw-species-shapes)) set i i + 1]
+  set species-shapes table-make
+  let i 0 foreach species-names [set species-shapes table-put species-shapes (list ? "shape") (item 0 (item i raw-species-shapes)) set species-shapes table-put species-shapes (list ? "color") (item 1 (item i raw-species-shapes)) set i i + 1]
   
   
   
   ;; setup fishes
+  set i 0
   foreach species-names [
-    let name ?
-    create-fishes (initial-fishes / 2 + random (initial-fishes / 2)) [new-fish name true]  
+    let name ? let num 0
+    ifelse i = 1 [set num (initial-fishes / 2 + random (initial-fishes / 2))][set num floor (initial-species-balance * (initial-fishes / 2 + random (initial-fishes / 2)))]
+    create-fishes num [new-fish name true]
+    set i i + 1  
   ]
   
   
@@ -108,12 +115,12 @@ to setup-ressources
   set ressources-matrix read-numeric-csv-as-matrix (word "setup/" setup-dir "/ressources-matrix.csv") ";"
   
   let raw-ressources-shapes-and-color map [explode ";" ?] (read-file (word "setup/" setup-dir "/ressources-shapes.csv"))
-  set ressources-shapes table:make
+  set ressources-shapes table-make
   ; requirement : nrow(ressources) == nrow(ressources shapes)
-  let i 0 foreach ressources-names [table:put ressources-shapes (list ? "shape") (item 0 (item i raw-ressources-shapes-and-color)) table:put ressources-shapes (list ? "color") (item 1 (item i raw-ressources-shapes-and-color)) set i i + 1]
+  let i 0 foreach ressources-names [set ressources-shapes table-put ressources-shapes (list ? "shape") (item 0 (item i raw-ressources-shapes-and-color)) set ressources-shapes table-put ressources-shapes (list ? "color") (item 1 (item i raw-ressources-shapes-and-color)) set i i + 1]
   
   set ressources-spatial-constraints read-table (word "setup/" setup-dir "/ressources-spatial-constraints.tab") ":" ;(task [report map read-from-string (explode ";" ?)])
-  foreach table:keys ressources-spatial-constraints [table:put ressources-spatial-constraints ? (map read-from-string (explode ";" (table:get ressources-spatial-constraints ?)))]
+  foreach table-keys ressources-spatial-constraints [set ressources-spatial-constraints table-put ressources-spatial-constraints ? (map read-from-string (explode ";" (table-get ressources-spatial-constraints ?)))]
   
   ; setup ressources in themselves
   foreach ressources-names [

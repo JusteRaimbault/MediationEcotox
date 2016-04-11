@@ -1,0 +1,59 @@
+
+;;;;;
+;;  replace extensions with ad-hoc libs (for OML embedding)
+;;;;;
+
+
+
+
+;;;;;;;;;;;;
+;; Matrix
+;;;;;;;;;;;;
+
+;; matrices assumed as list of rows
+
+to-report matrix-get-row [matrix row]
+   report item row matrix
+end
+
+
+
+
+;;;;;;;;;;;
+;; Table
+;;;;;;;;;;;
+
+;; table as list of entries
+;  (not efficient at all !)
+
+
+to-report table-make
+  report []
+end
+
+
+to-report table-put [table key value]
+  let index -1 let i 0
+  foreach table [if item 0 ? = key [set index i] set i i + 1]
+  ifelse index = -1 [report lput list key value table][
+    report replace-item index table list key value
+  ]
+end
+
+to-report table-keys [table]
+  let res []
+  foreach table [set res lput item 0 ? res]
+  report res
+end
+
+to-report table-get [table key]
+  foreach table [if item 0 ? = key [report item 1 ?]]
+  report nobody
+end
+
+;; extremely dirty : not useful double pass when testing for key.
+;; correct that if performance issues
+to-report table-has-key? [table key]
+  foreach table [if item 0 ? = key [report true]]
+  report false
+end

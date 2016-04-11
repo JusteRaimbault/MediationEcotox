@@ -3,18 +3,21 @@
 
 
 
-to setup-experiment [init-ressources init-fishes moving-cost reprod-cost max-age matur-age e-ressources e-fishes ressource-renew]
+to setup-experiment [init-ressources init-fishes species-balance moving-cost reprod-cost max-age matur-age e-ressources e-fishes ressource-renew]
   ; set experiment vars
   
-  set initial-ressources init-ressources    ; \in [0,100]
-  set initial-fishes init-fishes   ; \in [0,40]
+  show (word "params : ressources : " init-ressources " ; fishes : " init-fishes " ; balance : " species-balance " ; moving-cost : " moving-cost " ; reprod-cost : " reprod-cost " ; max-age : " max-age " ; matur-age : " matur-age " ; energyFromRessources : " e-ressources " ; energyFromFishes : " e-fishes " ; ressourcesRenewal : " ressource-renew)
+  
+  set initial-ressources floor init-ressources    ; \in [0,100]
+  set initial-fishes floor init-fishes   ; \in [0,40]
+  set initial-species-balance species-balance
   set fish-moving-cost moving-cost ; \in [0,1] ; J.m^-1
   set reproduction-cost reprod-cost  ; \in [0,1] ; J
-  set max-fish-age max-age ; \in [0,100] ; ticks
-  set fish-maturation-age matur-age ; ticks
+  set max-fish-age floor max-age ; \in [0,100] ; ticks
+  set fish-maturation-age floor matur-age ; ticks
   set energy-gain-from-ressources e-ressources
   set energy-gain-from-fishes e-fishes
-  set ressource-renewal-rate ressource-renew
+  set ressource-renewal-rate floor ressource-renew
   
   setup-headless
   
@@ -42,7 +45,7 @@ to setup-headless
   set fish-interaction-radius 1  ; fixed
   set ressource-eating-radius 1  ; fixed
   
-  set max-ticks 1000
+  set max-ticks 2000
   
   setup
   
@@ -52,6 +55,6 @@ end
 to run-experiment
   repeat max-ticks [
     if count fishes = 0 [stop]
-    go 
+    go
   ]
 end
