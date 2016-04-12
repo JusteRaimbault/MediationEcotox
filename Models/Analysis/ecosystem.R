@@ -5,7 +5,7 @@ setwd(paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Results/Ecosystem_simple_LH
 
 library(dplyr)
 
-res <- as.tbl(read.csv('2016_04_12_14_40_46_LOCAL.csv'))
+res <- as.tbl(read.csv('2016_04_12_14_50_14_GRID.csv'))
 
 gres <- res %>% group_by(id) %>% summarise(
   collapsed=mean(collapsed),finalSpecies=mean(finalSpecies),finalTime=mean(finalTime),speciesBalance=mean(speciesBalance),

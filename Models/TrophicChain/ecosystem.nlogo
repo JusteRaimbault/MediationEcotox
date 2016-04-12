@@ -311,7 +311,7 @@ fish-moving-cost
 fish-moving-cost
 0
 1
-0.4295
+0.126
 0.0005
 1
 NIL
@@ -494,7 +494,7 @@ energy-gain-from-ressources
 energy-gain-from-ressources
 0
 1
-0.05
+0.15
 0.05
 1
 NIL
@@ -509,7 +509,7 @@ energy-gain-from-fishes
 energy-gain-from-fishes
 0
 50
-0.05
+6.38
 0.01
 1
 NIL
@@ -539,7 +539,7 @@ reproduction-rate-species1
 reproduction-rate-species1
 0
 1
-0.05
+0.04
 0.01
 1
 NIL
@@ -554,7 +554,7 @@ reproduction-rate-species2
 reproduction-rate-species2
 0
 1
-0.42
+0.2
 0.01
 1
 NIL

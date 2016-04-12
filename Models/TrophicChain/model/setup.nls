@@ -99,14 +99,14 @@ to setup-species
   foreach species-names [
     let name ? let num 0
     ifelse i = 1 [
-      ;set num (initial-fishes / 2 + random (initial-fishes / 2))
-      set num reproduction-rate-species2 - energy-gain-from-fishes
+      set num (initial-fishes / 2 + random (initial-fishes / 2))
+      ;set num reproduction-rate-species2 - energy-gain-from-fishes
     ][
-      ;set num floor (initial-species-balance * (initial-fishes / 2 + random (initial-fishes / 2)))
-      set num 1 + reproduction-rate-species1
+      set num floor (initial-species-balance * (initial-fishes / 2 + random (initial-fishes / 2)))
+      ;set num 1 + reproduction-rate-species1
     ]
-    set num num * fish-moving-cost / (energy-gain-from-fishes + reproduction-rate-species2 * reproduction-rate-species1)
-    show num
+    ;set num num * fish-moving-cost * initial-fishes / (energy-gain-from-fishes + reproduction-rate-species2 * reproduction-rate-species1)
+    ;show num 
     create-fishes num [new-fish name true]
     set i i + 1  
   ]

@@ -49,3 +49,6 @@ to-report final-time
   report ticks
 end
 
+to-report trajectory [s-index]
+  report implode-with-delimiter (map [(word "" (item s-index ?))] species-count) "-"
+end

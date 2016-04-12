@@ -4,6 +4,18 @@
 ;;;;;
 
 
+;;
+; string
+
+;to-report implode [li delimiter]
+;  let res ""
+;  foreach but-last li [
+;    set res (word res delimiter ?)
+;  ]
+;  set res (word res last li)
+;  report res
+;end
+
 
 
 ;;;;;;;;;;;;
