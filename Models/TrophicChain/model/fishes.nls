@@ -31,6 +31,13 @@ to wander
       set heading 180 - heading
     ]
     
+    
+    ; direct towards potential mates
+    ;if (ticks - birth-date) > fish-maturation-age and random-float 1 < item species-index reproduction-rates [
+    ;  let potential-mate one-of other fishes with [species = [species] of myself and distance myself > 1]
+    ;  if potential-mate != nobody [set heading towards potential-mate]
+    ;]
+    
     ;rt random 60 lt random 60
     fd wandering-step-distance
   ]

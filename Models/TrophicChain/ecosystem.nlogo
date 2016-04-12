@@ -81,7 +81,8 @@ globals [
   ressource-eating-radius
   fish-interaction-radius
   
-  
+  ; list of reproduction rates per species
+  reproduction-rates
   
   ;;;;
   ;; environment
@@ -173,10 +174,10 @@ ressources-own [
 ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-166
-10
-1016
-675
+205
+12
+1055
+677
 24
 18
 17.152
@@ -242,7 +243,7 @@ initial-ressources
 initial-ressources
 0
 200
-200
+94
 1
 1
 NIL
@@ -257,17 +258,17 @@ initial-fishes
 initial-fishes
 0
 200
-100
+32
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-1019
-19
-1431
-292
+1071
+21
+1348
+217
 stocks
 time
 populations
@@ -284,10 +285,10 @@ PENS
 "species2" 1.0 0 -3844592 true "" "plot count fishes with [species-index = 1]"
 
 PLOT
-1019
-297
-1192
-469
+1068
+417
+1241
+589
 energy
 NIL
 NIL
@@ -302,30 +303,30 @@ PENS
 "total-energy" 1.0 0 -7500403 true "" "plot sum [energy] of fishes"
 
 SLIDER
-3
-291
-153
-324
+5
+276
+155
+309
 fish-moving-cost
 fish-moving-cost
 0
-0.1
-0.0105
+1
+0.4295
 0.0005
 1
 NIL
 HORIZONTAL
 
 SLIDER
-4
-328
-153
-361
+6
+313
+155
+346
 reproduction-cost
 reproduction-cost
 0
-0.1
-0.0815
+1
+0.4805
 0.0005
 1
 NIL
@@ -333,14 +334,14 @@ HORIZONTAL
 
 SLIDER
 10
-372
+346
 149
-405
+379
 max-fish-age
 max-fish-age
 0
 1000
-911
+919
 1
 1
 NIL
@@ -348,24 +349,24 @@ HORIZONTAL
 
 SLIDER
 7
-410
+384
 151
-443
+417
 fish-maturation-age
 fish-maturation-age
 0
 100
-12
+16
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1223
-310
-1280
-355
+1262
+427
+1319
+472
 fishes
 count fishes
 17
@@ -373,10 +374,10 @@ count fishes
 11
 
 MONITOR
-1224
-416
-1280
-461
+1260
+540
+1316
+585
 birthday
 mean [birth-date] of fishes
 17
@@ -385,9 +386,9 @@ mean [birth-date] of fishes
 
 SLIDER
 8
-568
+609
 150
-601
+642
 #-wandering-moves
 #-wandering-moves
 0
@@ -400,9 +401,9 @@ HORIZONTAL
 
 SLIDER
 -5
-603
+644
 161
-636
+677
 wandering-step-distance
 wandering-step-distance
 0
@@ -425,24 +426,24 @@ setup-dir
 
 SLIDER
 4
-522
+575
 161
-555
+608
 ressource-renewal-rate
 ressource-renewal-rate
 0
 100
-35
+10
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1224
-364
-1282
-409
+1263
+481
+1321
+526
 balance
 all-time-species-balance
 17
@@ -468,9 +469,9 @@ NIL
 
 SWITCH
 14
-640
+681
 141
-673
+714
 interactive?
 interactive?
 1
@@ -478,38 +479,38 @@ interactive?
 -1000
 
 OUTPUT
-1019
-487
-1390
-681
+1061
+605
+1432
+799
 10
 
 SLIDER
-3
-447
-160
-480
+23
+497
+186
+530
 energy-gain-from-ressources
 energy-gain-from-ressources
 0
-10
-7.9
-0.1
+1
+0.05
+0.05
 1
 NIL
 HORIZONTAL
 
 SLIDER
-4
-483
-160
-516
+28
+536
+184
+569
 energy-gain-from-fishes
 energy-gain-from-fishes
 0
-10
-0.9
-0.1
+50
+0.05
+0.01
 1
 NIL
 HORIZONTAL
@@ -523,11 +524,59 @@ initial-species-balance
 initial-species-balance
 0
 1
-0.18
+0.5
 0.01
 1
 NIL
 HORIZONTAL
+
+SLIDER
+4
+421
+203
+454
+reproduction-rate-species1
+reproduction-rate-species1
+0
+1
+0.05
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+9
+457
+204
+490
+reproduction-rate-species2
+reproduction-rate-species2
+0
+1
+0.42
+0.01
+1
+NIL
+HORIZONTAL
+
+PLOT
+1072
+221
+1282
+414
+phase space
+species1
+species2
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" "plotxy count fishes with [species-index = 0] count fishes with [species-index = 1]"
+PENS
+"default" 1.0 0 -15040220 true "" ""
 
 @#$#@#$#@
 ## WHAT IS IT?

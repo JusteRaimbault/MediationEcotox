@@ -49,8 +49,10 @@ end
 ;;
 ;
 to new-underbreeded-agent [shapes-table]
-  if table-has-key? shapes-table (list underbreed "shape") [set shape table-get shapes-table (list underbreed "shape") ]
-  if table-has-key? shapes-table (list underbreed "color") [let color-string table-get shapes-table (list underbreed "color") run (word "set color " color-string)]
+  if headless? != true [
+    if table-has-key? shapes-table (list underbreed "shape") [set shape table-get shapes-table (list underbreed "shape") ]
+    if table-has-key? shapes-table (list underbreed "color") [let color-string table-get shapes-table (list underbreed "color") run (word "set color " color-string)]
+  ]
 end
 
 
