@@ -12,6 +12,7 @@ gres <- res %>% group_by(id) %>% summarise(
   energyFromFishes=mean(energyFromFishes),energyFromRessources=mean(energyFromRessources),initialBalance=mean(initialBalance),
   maturAge=mean(maturAge),maxAge=mean(maxAge),movingCost=mean(movingCost),numFishes=mean(numFishes),numRessources=mean(numRessources),
   reproductionCost=mean(reproductionCost),ressourceRenewal=mean(ressourceRenewal)
-  )
+)
 
 data.frame(gres[gres$finalTime==2000,])
+data.frame(gres[gres$finalSpecies>1.1,])

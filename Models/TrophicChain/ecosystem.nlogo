@@ -243,7 +243,7 @@ initial-ressources
 initial-ressources
 0
 200
-94
+177
 1
 1
 NIL
@@ -258,7 +258,7 @@ initial-fishes
 initial-fishes
 0
 200
-32
+17
 1
 1
 NIL
@@ -311,7 +311,7 @@ fish-moving-cost
 fish-moving-cost
 0
 1
-0.126
+0.0255
 0.0005
 1
 NIL
@@ -326,7 +326,7 @@ reproduction-cost
 reproduction-cost
 0
 1
-0.4805
+0.4365
 0.0005
 1
 NIL
@@ -341,7 +341,7 @@ max-fish-age
 max-fish-age
 0
 1000
-919
+837
 1
 1
 NIL
@@ -356,7 +356,7 @@ fish-maturation-age
 fish-maturation-age
 0
 100
-16
+38
 1
 1
 NIL
@@ -433,7 +433,7 @@ ressource-renewal-rate
 ressource-renewal-rate
 0
 100
-10
+4
 1
 1
 NIL
@@ -493,8 +493,8 @@ SLIDER
 energy-gain-from-ressources
 energy-gain-from-ressources
 0
-1
-0.15
+50
+11.5
 0.05
 1
 NIL
@@ -509,7 +509,7 @@ energy-gain-from-fishes
 energy-gain-from-fishes
 0
 50
-6.38
+50
 0.01
 1
 NIL
@@ -524,7 +524,7 @@ initial-species-balance
 initial-species-balance
 0
 1
-0.5
+0.27
 0.01
 1
 NIL

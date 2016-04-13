@@ -18,15 +18,26 @@ globals [
   
   populations
   
-  ]
+]
+
+
 ;; Sheep and wolves are both breeds of turtle.
 breed [sheep a-sheep]  ;; sheep is its own plural, so we use "a-sheep" as the singular.
 breed [wolves wolf]
 turtles-own [energy]       ;; both wolves and sheep have energy
 patches-own [countdown]
 
+to test-experiment
+  setup-experiment 1 20 50 50 20 20 10 5
+  go-experiment
+  show trajectory 0
+  show trajectory 1
+  show trajectory 2
+end
+
+
 to setup-experiment [with-grass grass-r-time number-sheep number-wolves sheep-gain wolf-gain sheep-repro wolf-repro]
-  set grass? with-grass
+  ifelse with-grass < 0.5 [set grass? false][set grass? true]
   set grass-regrowth-time grass-r-time ; \in [0,100]
   set initial-number-sheep number-sheep ; \in [0,250]
   set initial-number-wolves number-wolves ; \in [0,250]
@@ -50,9 +61,16 @@ to go-experiment
   ]
 end
 
-
+;;
+; report only trajectory
 to-report trajectory [species]
-  
+  ifelse species < length first populations [
+    let res (word "" item species first populations)
+    foreach but-first populations [
+      set res (word res "-" (item species ?))
+    ]
+    report res
+  ][report ""]
 end
 
 
