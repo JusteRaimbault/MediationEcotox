@@ -1,0 +1,66 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
+
+logger.level("FINE")
+
+// Model parameters
+val withGrass = Val[Double]
+val grassRegrow = Val[Double]
+val initialSheep = Val[Double]
+val initialWolves = Val[Double]
+val sheepGain = Val[Double]
+val wolfGain = Val[Double]
+val sheepRepro = Val[Double]
+val wolfRepro = Val[Double]
+
+val replication = Val[Int]
+val id = Val[Int]
+
+// objectives
+val trajSpecies1 = Val[String]
+val trajSpecies2 = Val[String]
+val trajSpecies3 = Val[String]
+
+//setup-experiment [with-grass grass-r-time number-sheep number-wolves sheep-gain wolf-gain sheep-repro wolf-repro
+val cmds = Seq("setup-experiment ${withGrass} ${grassRegrow} ${initialSheep} ${initialWolves} ${sheepGain} ${wolfGain} ${sheepRepro} ${wolfRepro}", "go-experiment")
+val model =
+  NetLogo5Task.apply(workDirectory / "HEADLESS_PreyPredator.nlogo", cmds,embedWorkspace = true) set (
+    inputs += (withGrass,grassRegrow,initialSheep,initialWolves,sheepGain,wolfGain,sheepRepro,wolfRepro,id),
+    netLogoOutputs += ("trajectory 0", trajSpecies1),
+    netLogoOutputs += ("trajectory 1", trajSpecies2),
+    netLogoOutputs += ("trajectory 2", trajSpecies3),
+    outputs += (withGrass,grassRegrow,initialSheep,initialWolves,sheepGain,wolfGain,sheepRepro,wolfRepro,id)
+  )
+  
+val modelCapsule = Capsule(model)
+
+
+// Exploration
+val exploration = ExplorationTask (
+  LHS (
+    1000,
+    initialSheep in Range(0.0,250.0),
+    initialWolves in Range(0.0,250.0)
+  ) x ((withGrass in (0.0 to 1.0 by 1.0))
+    x (grassRegrow in (20.0 to 100.0 by 20.0))
+    x (sheepGain in (20.0 to 100.0 by 20.0))
+    x (wolfGain in (20.0 to 100.0 by 20.0))
+    x (sheepRepro in (0.0 to 20.0 by 5.0))
+    x (wolfRepro in (0.0 to 20.0 by 5.0))
+  withIndex id) // x (replication in (UniformDistribution[Int]() take 10)) 
+)
+val purpose = "LHSGRID_EGI"
+
+
+val indics_hook = AppendToCSVFileHook(
+    workDirectory / "res" / ((new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")).format(new Date()))+"_"+purpose+".csv"
+)
+
+
+//val local = LocalEnvironment(10)
+val grid =  EGIEnvironment("vo.complex-systems.eu")
+
+exploration -< (modelCapsule on grid by 20000 hook indics_hook) 
+
+

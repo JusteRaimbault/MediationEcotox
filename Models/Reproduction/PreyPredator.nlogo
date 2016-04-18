@@ -128,10 +128,10 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-350
-10
-819
-500
+668
+21
+1137
+511
 25
 25
 9.0
@@ -163,7 +163,7 @@ initial-number-sheep
 initial-number-sheep
 0
 250
-52
+171
 1
 1
 NIL
@@ -177,8 +177,8 @@ SLIDER
 sheep-gain-from-food
 sheep-gain-from-food
 0.0
-50.0
-7
+100.0
+0
 1.0
 1
 NIL
@@ -193,7 +193,7 @@ sheep-reproduce
 sheep-reproduce
 1.0
 20.0
-9
+8
 1.0
 1
 %
@@ -208,7 +208,7 @@ initial-number-wolves
 initial-number-wolves
 0
 250
-188
+202
 1
 1
 NIL
@@ -223,7 +223,7 @@ wolf-gain-from-food
 wolf-gain-from-food
 0.0
 100.0
-9
+21
 1.0
 1
 NIL
@@ -238,7 +238,7 @@ wolf-reproduce
 wolf-reproduce
 0.0
 20.0
-3
+10
 1.0
 1
 %
@@ -251,7 +251,7 @@ SWITCH
 120
 grass?
 grass?
-0
+1
 1
 -1000
 
@@ -264,7 +264,7 @@ grass-regrowth-time
 grass-regrowth-time
 0
 100
-30
+60
 1
 1
 NIL
@@ -399,10 +399,10 @@ show-energy?
 -1000
 
 PLOT
-921
-62
-1191
-322
+368
+38
+638
+298
 phase space
 NIL
 NIL
