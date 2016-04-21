@@ -1,41 +1,49 @@
 
+
+
+__includes [
+  "equa-diff.nls"  
+  "agent-deterministic.nls"
+  "agent.nls"
+]
+
+
 globals [
   delta-x
   delta-y
+  delta-z
   
   x
   y
+  z
   
   ]
 
 breed [preys prey]
 breed [predators predator]
-
+breed [ressources ressource]
 
 to setup
   ca reset-ticks
   
-  ; set at attractor
-  if mode = "agent-deterministic" [
-  set initial-preys prey-reproduction / predator-gain
-  set initial-predators predator-carrying / predator-gain
-  set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
+  if mode = "agent-random" [
+    setup-agent 
   ]
   
-  if mode = "agent-random" [
-  create-preys initial-preys [
+  if mode = "agent-deterministic" [set initial-preys prey-reproduction / predator-gain 
+    set initial-predators predator-carrying / predator-gain
+    
+  create-preys initial-preys - 10 + random 20 [
     setxy random-xcor random-ycor
   ]
-  create-predators initial-predators [
+  create-predators initial-predators - 10 + random 20 [
     setxy random-xcor random-ycor 
   ]
     set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
   ]
   
   if mode = "equa-diff" [
-    set x initial-preys 
-    set y initial-predators
-    set-current-plot "phase space" plot-pen-up plotxy x y plot-pen-down
+    setup-equa-diff
   ]
   
 
@@ -46,49 +54,24 @@ end
 to go
   if (count preys = 0 or count predators = 0) and mode != "equa-diff"[stop]
   if mode = "agent-random" [
- 
-  
-  ask turtles [
-    wander 
-  ]
-  
-  ask preys [
-    ; prey reproduction
-    if random 100 < prey-reproduction [hatch 1 [set heading random 360]]
-  ]
-  
-  ask predators [
-    if random 100 < predator-carrying [die]
-    ; eat
-    if count preys-here > 0 and random 100 < predator-gain [
-      ask one-of preys-here [die]
-      hatch 1 [set heading random 360]
-    ] 
-  ]
+     go-agent
   ]
   
   if mode = "agent-deterministic" [
-    set delta-x (predator-gain / 100 * (count predators) * (count preys)) - ((count predators) * predator-carrying / 100)
-    set delta-y ((count preys) * prey-reproduction / 100) - (predator-gain / 100 *(count predators) * (count preys))
-    ifelse delta-x > 0 [create-predators (floor delta-x + 1)][ask n-of (min list count predators (abs(floor delta-x) + 1)) predators [die]]
-    ifelse delta-y > 0 [create-preys (floor delta-y + 1)][ask n-of (min list count preys (abs (floor delta-y) + 1)) preys [die]]
+    go-agent-deterministic
   ]
   
   if mode = "equa-diff" [
-    set delta-x (predator-gain / 100 * x * y) - (x * predator-carrying / 100)
-    set delta-y (y * prey-reproduction / 100) - (predator-gain / 100 * x * y)
-    ;show delta-x show delta-y
-    set x max list 0 (x + delta-x)
-    set y max list 0 (y + delta-y)
+    go-equa-diff
   ]
   
   tick
 end
 
-to wander
-  set heading heading - 20 + random 40
-  fd 1
-end
+
+
+
+
 
 ;;
 ; experimental jump in phase space
@@ -103,7 +86,7 @@ end
 
 to-report move-constant
   ifelse mode != "equa-diff" [
-    report 0
+     report (count preys ^ (predator-carrying / 100)) * (count predators ^ (prey-reproduction / 100)) * exp ( - predator-gain / 100 * (count preys + count predators))
   ][
      ; NO, optimal constant ;report ((predator-carrying / (predator-gain * e )) ^ (predator-carrying / 100))*((prey-reproduction / (predator-gain * e )) ^ (prey-reproduction / 100))
      report (y ^ (predator-carrying / 100)) * (x ^ (prey-reproduction / 100)) * exp ( - predator-gain / 100 * (x + y))
@@ -112,13 +95,13 @@ to-report move-constant
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-454
-18
-1777
-1362
-50
-50
-13.0
+739
+15
+1397
+694
+40
+40
+8.0
 1
 10
 1
@@ -128,10 +111,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--50
-50
--50
-50
+-40
+40
+-40
+40
 0
 0
 1
@@ -147,7 +130,7 @@ initial-preys
 initial-preys
 0
 1000
-357
+88.14722423593383
 1
 1
 NIL
@@ -162,7 +145,7 @@ initial-predators
 initial-predators
 0
 1000
-354
+12.631578947368421
 1
 1
 NIL
@@ -177,20 +160,20 @@ prey-reproduction
 prey-reproduction
 0
 100
-0.0035
-0.01
+1.5
+0.05
 1
 %
 HORIZONTAL
 
 PLOT
-17
-137
-244
-354
+4
+140
+388
+507
 phase space
-NIL
-NIL
+preys
+predators
 0.0
 10.0
 0.0
@@ -202,23 +185,24 @@ PENS
 "default" 1.0 0 -16777216 true "" ""
 
 PLOT
-20
-522
-349
-751
+3
+511
+399
+714
 stocks
 NIL
 NIL
 0.0
 10.0
-0.0
-10.0
+350.0
+400.0
 true
 true
 "" ""
 PENS
-"preys" 1.0 0 -11783835 true "" "plot count preys"
-"predators" 1.0 0 -15302303 true "" "plot count predators"
+"preys" 1.0 0 -11783835 true "" "ifelse mode = \"equa-diff\"[plot y][plot count preys]"
+"predators" 1.0 0 -8053223 true "" "ifelse mode = \"equa-diff\"[plot x][plot count predators]"
+"ressources" 1.0 0 -14439633 true "" "ifelse mode = \"equa-diff\"[plot z][plot count ressources]"
 
 SLIDER
 11
@@ -229,8 +213,8 @@ predator-carrying
 predator-carrying
 0
 100
-0.0035
-0.01
+0.95
+0.05
 1
 %
 HORIZONTAL
@@ -244,17 +228,17 @@ predator-gain
 predator-gain
 0
 100
-1.0E-5
-0.01
+0.018
+0.001
 1
 %
 HORIZONTAL
 
 BUTTON
-258
-169
-324
-202
+545
+277
+611
+310
 NIL
 setup
 NIL
@@ -268,10 +252,10 @@ NIL
 1
 
 BUTTON
-258
-208
-321
-241
+545
+316
+608
+349
 go
 ;repeat 50 [go]\ngo
 T
@@ -285,20 +269,20 @@ NIL
 1
 
 CHOOSER
-277
-109
-448
-154
+408
+271
+527
+316
 mode
 mode
 "agent-deterministic" "agent-random" "equa-diff"
-2
+1
 
 MONITOR
-268
-260
-326
-305
+539
+217
+597
+262
 NIL
 delta-x
 17
@@ -306,10 +290,10 @@ delta-x
 11
 
 MONITOR
-268
-307
-325
-352
+599
+216
+656
+261
 NIL
 delta-y
 17
@@ -317,10 +301,10 @@ delta-y
 11
 
 BUTTON
-327
-169
-401
-202
+614
+277
+688
+310
 update
 update
 NIL
@@ -334,10 +318,10 @@ NIL
 1
 
 PLOT
-15
-363
-215
-513
+526
+11
+726
+161
 K
 NIL
 NIL
@@ -350,6 +334,150 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot move-constant"
+
+SWITCH
+418
+167
+528
+200
+renewal?
+renewal?
+0
+1
+-1000
+
+BUTTON
+615
+317
+681
+350
+go once
+repeat 100 [go]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+CHOOSER
+396
+212
+534
+257
+species
+species
+"two-species" "three-species"
+1
+
+SLIDER
+351
+64
+519
+97
+ressource-renewal
+ressource-renewal
+0
+100
+12
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+352
+101
+519
+134
+ressource-prelevement
+ressource-prelevement
+0
+100
+3
+1
+1
+%
+HORIZONTAL
+
+MONITOR
+539
+170
+596
+215
+NIL
+x
+17
+1
+11
+
+MONITOR
+599
+170
+656
+215
+NIL
+y
+17
+1
+11
+
+MONITOR
+658
+169
+715
+214
+NIL
+z
+17
+1
+11
+
+MONITOR
+658
+217
+715
+262
+NIL
+delta-z
+17
+1
+11
+
+BUTTON
+545
+364
+608
+397
+art
+draw-phase-space-stable-attractor
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+308
+25
+448
+58
+initial-ressources
+initial-ressources
+0
+250
+0.045378626890095225
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

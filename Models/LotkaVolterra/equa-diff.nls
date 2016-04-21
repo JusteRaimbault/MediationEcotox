@@ -1,0 +1,59 @@
+
+;;
+; equa diff
+
+
+
+to setup-equa-diff
+  ifelse species = "two-species" [
+     set initial-preys prey-reproduction / predator-gain - 10 + random 20
+     set initial-predators predator-carrying / predator-gain - 10 + random 20
+     set x initial-preys 
+     set y initial-predators
+    ][
+      set x ressource-renewal / predator-carrying - 5 + random 10
+      set y predator-carrying / predator-gain - 5 + random 10
+      set z ressource-renewal * predator-gain / (predator-carrying * ressource-prelevement)
+    ]
+    
+    set-current-plot "phase space" plot-pen-up plotxy x y plot-pen-down
+end
+
+
+to go-equa-diff
+  ifelse species = "two-species" [
+      set delta-x (predator-gain / 100 * x * y) - (x * predator-carrying / 100)
+      set delta-y (y * prey-reproduction / 100) - (predator-gain / 100 * x * y)
+      ;show delta-x show delta-y
+      set x max list 0 (x + delta-x)
+      set y max list 0 (y + delta-y)
+    ][
+      set delta-x (predator-gain / 100 * x * y) - (x * predator-carrying / 100)
+      set delta-y (y * z * ressource-prelevement / 100) - (predator-gain / 100 * x * y) + (prey-reproduction / 100 * y)
+      set delta-z ressource-renewal / 100 - (y * z * ressource-prelevement / 100)
+      ;show delta-x show delta-y show delta-z
+      set x max list 0 (x + delta-x)
+      set y max list 0 (y + delta-y)
+      set z max list 0 (z + delta-z)
+    ]
+end
+
+
+
+
+to draw-phase-space-stable-attractor
+  let xstar ressource-renewal / predator-carrying
+  let ystar predator-carrying / predator-gain
+  let zstar ressource-renewal * predator-gain / (predator-carrying * ressource-prelevement)
+   
+  set x random-float 50 set y random-float 50 set z random-float 50
+   
+  set-current-plot "phase space" plot-pen-up plotxy x y plot-pen-down set-plot-pen-color random 140
+  
+  while [true] [
+    if abs (x - xstar) +  abs (y - ystar) +  abs (z - zstar) < 0.1 [stop]
+    go
+  ]
+    
+  
+end

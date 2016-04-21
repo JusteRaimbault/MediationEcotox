@@ -1,0 +1,99 @@
+
+;;
+;  agent
+
+
+to setup-agent
+  ifelse species = "two-species" [
+    set initial-preys predator-carrying / 100 * sqrt 2 * world-height * world-width
+    set initial-predators prey-reproduction / 100 * sqrt 2 * world-height * world-width   
+  ][
+    set initial-predators ressource-renewal / predator-carrying
+    set initial-preys predator-carrying / 100 * sqrt 2 * world-height * world-width
+    set initial-ressources ressource-renewal * 100 / (ressource-prelevement * predator-carrying) / (sqrt 2 * world-height * world-width)
+  ]
+  
+  
+  create-preys initial-preys - 5 + random 10 [
+    new-prey
+  ]
+  
+  create-predators initial-predators - 5 + random 10 [
+    new-predator
+  ]
+  
+  create-ressources initial-ressources - 5 + random 10 [
+    new-ressource  
+  ]
+  
+  
+  set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
+  
+  
+end
+
+
+to go-agent
+  
+    ask turtles [
+      wander 
+    ]
+  
+    ask preys [
+      ; prey reproduction
+      ifelse species = "two-species" [
+        if random 100 < prey-reproduction [hatch 1 [set heading random 360]]
+      ][
+        if count ressources-here > 0 [
+          ask one-of ressources-here [die]
+          hatch 1 [set heading random 360]  
+        ]
+      ]
+    ]
+  
+    ask predators [
+      if random 100 < predator-carrying [die]
+      ; eat
+      ;  proba of encounter is given by normalized quantities, assuming uniform distributions in space
+      ;  drawing is done by encountering by according number of eating is done
+      let potential-eatings 1;floor ( predator-gain / 100 * (world-width * world-height))
+      if count preys-here > 0 [
+        ;ask one-of preys-here [die]
+        ask n-of (min list count preys-here potential-eatings) preys-here [die]
+        hatch potential-eatings [set heading random 360]
+      ] 
+    ]
+    
+    if species = "three-species" [
+      ; renew ressources
+      if random-float 100 < ressource-renewal [create-ressources 1 [new-ressource]]
+    ]
+    
+    if renewal? [
+      if count preys = 0 or count predators = 0 [ask turtles [die]
+        setup-agent
+      ]
+    ]
+    
+end
+
+
+to wander
+  set heading heading - 20 + random 40
+  fd 1
+end
+
+
+
+
+to new-prey
+  setxy random-xcor random-ycor
+end
+
+to new-predator
+  setxy random-xcor random-ycor 
+end
+
+to new-ressource
+  setxy random-xcor random-ycor
+end

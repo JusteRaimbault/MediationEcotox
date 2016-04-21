@@ -1,0 +1,14 @@
+
+;;;
+; agent deterministic
+
+
+
+
+to go-agent-deterministic
+  set delta-x (predator-gain / 100 * (count predators) * (count preys)) - ((count predators) * predator-carrying / 100)
+    set delta-y ((count preys) * prey-reproduction / 100) - (predator-gain / 100 *(count predators) * (count preys))
+    ifelse delta-x > 0 [create-predators (floor delta-x + 1)][ask n-of (min list count predators (abs(floor delta-x) + 1)) predators [die]]
+    ifelse delta-y > 0 [create-preys (floor delta-y + 1)][ask n-of (min list count preys (abs (floor delta-y) + 1)) preys [die]]
+    if renewal? [if count preys = 0 or count predators = 0 [ask turtles [die] create-preys initial-preys - 10 + random 20 create-predators initial-predators - 10 + random 20]]
+end
