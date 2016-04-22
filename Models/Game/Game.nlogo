@@ -1,104 +1,161 @@
 
-
-
-__includes [
-  "equa-diff.nls"  
-  "agent-deterministic.nls"
-  "agent.nls"
-]
-
+; no includes to have easy-to-setup game
 
 globals [
-  delta-x
-  delta-y
-  delta-z
+  initial-preys
+  initial-predators
   
-  x
-  y
-  z
+  prey-reproduction
+  predator-carrying
   
-  ]
+  populations
+  
+]
 
 breed [preys prey]
 breed [predators predator]
-breed [ressources ressource]
+
+
+
+
 
 to setup
   ca reset-ticks
-  
-  if mode = "agent-random" [
-    setup-agent 
-  ]
-  
-  if mode = "agent-deterministic" [set initial-preys prey-reproduction / predator-gain 
-    set initial-predators predator-carrying / predator-gain
-    
-  create-preys initial-preys - 10 + random 20 [
-    setxy random-xcor random-ycor
-  ]
-  create-predators initial-predators - 10 + random 20 [
-    setxy random-xcor random-ycor 
-  ]
-    set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
-  ]
-  
-  if mode = "equa-diff" [
-    setup-equa-diff
-  ]
-  
+  setup-globals
+  setup-world
+  setup-agents
+  setup-plot
+end
 
+to setup-globals
+  ; fixed parameter values (for now ?)
+  set prey-reproduction 0.015
+  set predator-carrying 0.015
+  
+  set initial-predators predator-carrying * sqrt 2 * world-height * world-width
+  set initial-preys prey-reproduction * sqrt 2 * world-height * world-width
+  
+  set populations []
+  
+end
 
+to setup-agents
+  create-preys initial-preys - 10 + random 20 [setxy random-xcor random-ycor new-prey]
+  create-predators initial-predators - 10 + random 20 [setxy random-xcor random-ycor new-predator]
+end
+
+to setup-world
+  ask patches [set pcolor blue]
+end
+
+to setup-plot
+  set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
+end
+
+to new-prey
+  set size 2 set shape "fish" set color grey  
+end
+
+to new-predator
+  set size 3 set shape "shark" set color brown
 end
 
 
-to go
-  if (count preys = 0 or count predators = 0) and mode != "equa-diff"[stop]
-  if mode = "agent-random" [
-     go-agent
-  ]
+
+to go-one-turn
   
-  if mode = "agent-deterministic" [
-    go-agent-deterministic
-  ]
+  event
   
-  if mode = "equa-diff" [
-    go-equa-diff
-  ]
-  
+  repeat 150 [ if count preys = 0 or count predators = 0 [game-lost update-plot stop] go]
+  update-plot
   tick
 end
 
 
-
-
-
-
-;;
-; experimental jump in phase space
-to update
-  ifelse mode != "equa-diff" [
-    ifelse count preys > initial-preys [ask n-of (count preys - initial-preys) preys [die]][create-preys initial-preys - count preys [setxy random-xcor random-ycor]]
-    ifelse count predators > initial-predators [ask n-of (count predators - initial-predators) predators [die]][create-predators initial-predators - count predators [setxy random-xcor random-ycor]]
-  ][
-    set x initial-predators set y initial-preys
-  ]
-end
-
-to-report move-constant
-  ifelse mode != "equa-diff" [
-     report (count preys ^ (predator-carrying / 100)) * (count predators ^ (prey-reproduction / 100)) * exp ( - predator-gain / 100 * (count preys + count predators))
-  ][
-     ; NO, optimal constant ;report ((predator-carrying / (predator-gain * e )) ^ (predator-carrying / 100))*((prey-reproduction / (predator-gain * e )) ^ (prey-reproduction / 100))
-     report (y ^ (predator-carrying / 100)) * (x ^ (prey-reproduction / 100)) * exp ( - predator-gain / 100 * (x + y))
-  ]
+to go
   
+    ask turtles [
+      wander 
+    ]
+  
+    ask preys [
+      ; prey reproduction
+      if random-float 1 < prey-reproduction [hatch 1 [set heading random 360]]
+    ]
+  
+    ask predators [
+      if random-float 1 < predator-carrying [die]
+      ; eat
+      ;  proba of encounter is given by normalized quantities, assuming uniform distributions in space
+      ;  drawing is done by encountering by according number of eating is done
+      if count preys-here > 0 [
+        ;ask one-of preys-here [die]
+        ask one-of preys-here [die]
+        hatch 1 [set heading random 360]
+      ] 
+    ]   
+    
+    set populations lput (list count preys count predators) populations
 end
+
+
+to wander
+  set heading heading - 20 + random 40
+  fd 1
+end
+
+
+to update-plot
+  let t0 (max list 0 (length populations - 500)) let tf length populations
+  ; phase space
+  set-current-plot "phase space"
+  let pops-to-plot sublist populations t0 tf
+  let t 0 foreach pops-to-plot [set-plot-pen-color scale-color black (- t) (- length pops-to-plot) 0 plotxy item 0 ? item 1 ? set t t + 1]
+  
+  ; stocks
+  let turns (list (t0 / 150)) let current-turn t0 / 150 repeat (tf - t0) [set current-turn current-turn + ((tf - t0)/ 150) set turns lput current-turn turns]
+  set-current-plot "stocks"
+  clear-plot set-current-plot-pen "preys" plot-pen-up plotxy first turns first first pops-to-plot plot-pen-down
+  let i 0 foreach pops-to-plot [plotxy item i turns first ? set i i + 1]
+  set-current-plot-pen "predators" plot-pen-up plotxy first turns last first pops-to-plot plot-pen-down
+  set i 0 foreach pops-to-plot [plotxy item i turns last ? set i i + 1]
+end
+
+
+to game-lost
+  user-message "The ecosystem collapsed - game is lost !"
+end
+
+
+to event
+  if random 10 <= 2 [
+    let delta-x -20 + random 40 let delta-y -20 + random 40
+    user-message (word "Event : " delta-x " preys ; " delta-y " predators")
+    ifelse delta-x > 0 [create-preys delta-x [setxy random-xcor random-ycor new-prey]][ask n-of (min list count preys abs delta-x) preys [die]]
+    ifelse delta-y > 0 [create-predators delta-y [setxy random-xcor random-ycor new-predator]][ask n-of (min list count predators abs delta-y) predators [die]]
+  ]
+end
+
+to action-prey
+  let delta-reprod (read-from-string user-input "Change reproduction (%) : " ) / 100
+  set prey-reproduction prey-reproduction + delta-reprod
+end
+
+to action-predator
+  let delta-carrying (read-from-string user-input "Change survival (%) : ") / 100
+  set predator-carrying predator-carrying + delta-carrying
+end
+
+
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
-739
-15
-1397
-694
+665
+20
+1323
+699
 40
 40
 8.0
@@ -121,56 +178,11 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
-SLIDER
-11
-25
-155
-58
-initial-preys
-initial-preys
-0
-1000
-139.17982774094816
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-162
-26
-304
-59
-initial-predators
-initial-predators
-0
-1000
-139.17982774094816
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-11
-62
-169
-95
-prey-reproduction
-prey-reproduction
-0
-100
-1.5
-0.05
-1
-%
-HORIZONTAL
-
 PLOT
-4
-140
-388
-507
+17
+53
+336
+352
 phase space
 preys
 predators
@@ -180,66 +192,35 @@ predators
 10.0
 true
 false
-"" "if mode = \"agent-deterministic\" or mode = \"agent-random\" [plotxy count preys count predators]\nif mode = \"equa-diff\" [plotxy x y]"
+"" "plotxy count preys count predators"
 PENS
 "default" 1.0 0 -16777216 true "" ""
 
 PLOT
-3
-511
-399
-714
+22
+392
+412
+614
 stocks
-NIL
-NIL
+turns
+stocks
 0.0
 10.0
-350.0
-400.0
+0.0
+10.0
 true
 true
 "" ""
 PENS
-"preys" 1.0 0 -11783835 true "" "ifelse mode = \"equa-diff\"[plot y][plot count preys]"
-"predators" 1.0 0 -8053223 true "" "ifelse mode = \"equa-diff\"[plot x][plot count predators]"
-"ressources" 1.0 0 -14439633 true "" "ifelse mode = \"equa-diff\"[plot z][plot count ressources]"
-
-SLIDER
-11
-99
-170
-132
-predator-carrying
-predator-carrying
-0
-100
-1.5
-0.05
-1
-%
-HORIZONTAL
-
-SLIDER
-173
-64
-345
-97
-predator-gain
-predator-gain
-0
-100
-0.018
-0.001
-1
-%
-HORIZONTAL
+"preys" 1.0 0 -7500403 true "" ""
+"predators" 1.0 0 -8431303 true "" ""
 
 BUTTON
-545
-277
-611
-310
-NIL
+400
+37
+495
+70
+New Game
 setup
 NIL
 1
@@ -252,13 +233,13 @@ NIL
 1
 
 BUTTON
-545
-316
-608
-349
-go
-;repeat 50 [go]\ngo
-T
+402
+106
+497
+141
+One Turn
+go-one-turn
+NIL
 1
 T
 OBSERVER
@@ -267,92 +248,14 @@ NIL
 NIL
 NIL
 1
-
-CHOOSER
-408
-271
-527
-316
-mode
-mode
-"agent-deterministic" "agent-random" "equa-diff"
-1
-
-MONITOR
-539
-217
-597
-262
-NIL
-delta-x
-17
-1
-11
-
-MONITOR
-599
-216
-656
-261
-NIL
-delta-y
-17
-1
-11
 
 BUTTON
-614
-277
-688
-310
-update
-update
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-PLOT
-526
-11
-726
-161
-K
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot move-constant"
-
-SWITCH
-418
+404
 167
-528
+531
 200
-renewal?
-renewal?
-0
-1
--1000
-
-BUTTON
-615
-317
-681
-350
-go once
-repeat 100 [go]
+Action Prey
+action-prey
 NIL
 1
 T
@@ -363,98 +266,14 @@ NIL
 NIL
 1
 
-CHOOSER
-396
-212
-534
-257
-species
-species
-"two-species" "three-species"
-0
-
-SLIDER
-351
-64
-519
-97
-ressource-renewal
-ressource-renewal
-0
-100
-12
-1
-1
-%
-HORIZONTAL
-
-SLIDER
-352
-101
-519
-134
-ressource-prelevement
-ressource-prelevement
-0
-100
-3
-1
-1
-%
-HORIZONTAL
-
-MONITOR
-539
-170
-596
-215
-NIL
-x
-17
-1
-11
-
-MONITOR
-599
-170
-656
-215
-NIL
-y
-17
-1
-11
-
-MONITOR
-658
-169
-715
-214
-NIL
-z
-17
-1
-11
-
-MONITOR
-658
-217
-715
-262
-NIL
-delta-z
-17
-1
-11
-
 BUTTON
-545
-364
-608
-397
-art
-draw-phase-space-stable-attractor
-T
+403
+206
+531
+239
+Action Predator
+action-predator
+NIL
 1
 T
 OBSERVER
@@ -463,21 +282,6 @@ NIL
 NIL
 NIL
 1
-
-SLIDER
-308
-25
-448
-58
-initial-ressources
-initial-ressources
-0
-250
-0.045378626890095225
-1
-1
-NIL
-HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -707,6 +511,19 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
+
+shark
+false
+0
+Polygon -7500403 true true 283 153 288 149 271 146 301 145 300 138 247 119 190 107 104 117 54 133 39 134 10 99 9 112 19 142 9 175 10 185 40 158 69 154 64 164 80 161 86 156 132 160 209 164
+Polygon -7500403 true true 199 161 152 166 137 164 169 154
+Polygon -7500403 true true 188 108 172 83 160 74 156 76 159 97 153 112
+Circle -16777216 true false 256 129 12
+Line -16777216 false 222 134 222 150
+Line -16777216 false 217 134 217 150
+Line -16777216 false 212 134 212 150
+Polygon -7500403 true true 78 125 62 118 63 130
+Polygon -7500403 true true 121 157 105 161 101 156 106 152
 
 sheep
 false
