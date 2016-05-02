@@ -1,0 +1,88 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
+
+logger.level("FINE")
+
+// Model parameters
+val preyReproduction = Val[Double]
+val predatorCarrying = Val[Double]
+val prelevementProba = Val[Double]
+val initialPreysRatio = Val[Double]
+val initialPredatorsRatio = Val[Double]
+
+val initialPreys = Val[Double]
+val initialPredators = Val[Double]
+
+//val replication = Val[Int]
+val id = Val[Int]
+
+// indicators
+val trajPrey = Val[String]
+val trajPredator = Val[String]
+
+//setup-experiment [prey-reprod pred-carrying prelevement initial-pred-ratio initial-prey-ratio]
+val cmds = Seq("setup-experiment ${preyReproduction} ${predatorCarrying} ${prelevementProba} ${initialPreysRatio} ${initialPredatorsRatio}",
+    "go-experiment")
+val model =
+  NetLogo5Task.apply(workDirectory / "HEADLESS_Game.nlogo", cmds,embedWorkspace = true) set (
+    inputs += (preyReproduction,predatorCarrying,prelevementProba,initialPreysRatio,initialPredatorsRatio,id),
+    netLogoOutputs += ("initial-preys", initialPreys),
+    netLogoOutputs += ("initial-predators", initialPredators),
+    netLogoOutputs += ("trajectory 0", trajPrey),
+    netLogoOutputs += ("trajectory 1", trajPredator),
+    outputs += (preyReproduction,predatorCarrying,prelevementProba,initialPreysRatio,initialPredatorsRatio,id)
+  )
+  
+val modelCapsule = Capsule(model)
+
+
+// Exploration -- dirty
+val exploration1 = ExplorationTask (
+  (LHS(10000,initialPreysRatio in Range(0.2,1.0),initialPredatorsRatio in Range(0.2,1.0))
+  ) x ((preyReproduction in (0.01 to 0.02 by 0.005))
+    x (predatorCarrying in (0.01 to 0.02 by 0.005))
+    x (prelevementProba in (0.6 to 1.0 by 0.2))
+  withIndex id) // x (replication in (UniformDistribution[Int]() take 10)) 
+)
+val exploration2 = ExplorationTask (
+  ( LHS (10000,initialPreysRatio in Range(0.2,1.0),initialPredatorsRatio in Range(1.0,2.0))
+  ) x ((preyReproduction in (0.01 to 0.02 by 0.005))
+    x (predatorCarrying in (0.01 to 0.02 by 0.005))
+    x (prelevementProba in (0.6 to 1.0 by 0.2))
+  withIndex id) // x (replication in (UniformDistribution[Int]() take 10)) 
+)
+val exploration3 = ExplorationTask (
+  (LHS (10000,initialPreysRatio in Range(1.0,2.0),initialPredatorsRatio in Range(1.0,2.0))
+  ) x ((preyReproduction in (0.01 to 0.02 by 0.005))
+    x (predatorCarrying in (0.01 to 0.02 by 0.005))
+    x (prelevementProba in (0.6 to 1.0 by 0.2))
+  withIndex id) // x (replication in (UniformDistribution[Int]() take 10)) 
+)
+val exploration4 = ExplorationTask (
+  (LHS (10000,initialPreysRatio in Range(1.0,2.0),initialPredatorsRatio in Range(0.2,1.0))
+  ) x ((preyReproduction in (0.01 to 0.02 by 0.005))
+    x (predatorCarrying in (0.01 to 0.02 by 0.005))
+    x (prelevementProba in (0.6 to 1.0 by 0.2))
+  withIndex id) // x (replication in (UniformDistribution[Int]() take 10)) 
+)
+
+
+//val purpose = "TEST"
+val purpose = "LHSGRID_EGI"
+
+
+val indics_hook = AppendToCSVFileHook(
+    workDirectory / "res" / ((new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")).format(new Date()))+"_"+purpose+".csv"
+)
+
+
+//val local = LocalEnvironment(10)
+val grid =  EGIEnvironment("vo.complex-systems.eu")
+
+
+exploration4 -< (modelCapsule on grid by 1000 hook indics_hook)
+//exploration2 -< (modelCapsule on local hook indics_hook) 
+//exploration3 -< (modelCapsule on local hook indics_hook) 
+//exploration4 -< (modelCapsule on local hook indics_hook) 
+

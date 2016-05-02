@@ -18,15 +18,19 @@ breed [predators predator]
 
 
 
-
-
-to setup
+to setup-experiment [prey-reprod pred-carrying prelevement initial-pred-ratio initial-prey-ratio]
   ca reset-ticks
-  setup-globals
-  setup-world
+  set prey-reproduction prey-reprod set predator-carrying pred-carrying set prelevement-proba prelevement
+  ; set at attractor and apply ratios
+  set initial-predators predator-carrying * sqrt 2 * world-height * world-width / prelevement-proba set initial-predators floor (initial-predators * initial-pred-ratio)
+  set initial-preys prey-reproduction * sqrt 2 * world-height * world-width / prelevement-proba set initial-preys floor (initial-preys * initial-prey-ratio)
+  
+  set populations []
+  
   setup-agents
-  setup-plot
 end
+
+
 
 to setup-globals
   ; fixed parameter values (for now ?)
@@ -42,36 +46,27 @@ to setup-globals
 end
 
 to setup-agents
-  create-preys initial-preys - 10 + random 20 [setxy random-xcor random-ycor new-prey]
-  create-predators initial-predators - 10 + random 20 [setxy random-xcor random-ycor new-predator]
+  create-preys initial-preys [setxy random-xcor random-ycor new-prey]
+  create-predators initial-predators [setxy random-xcor random-ycor new-predator]
 end
 
-to setup-world
-  ask patches [set pcolor blue]
-end
 
-to setup-plot
-  set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
-end
 
 to new-prey
-  set size 2 set shape "fish" set color grey  
+  ;set size 2 set shape "fish" set color grey  
 end
 
 to new-predator
-  set size 3 set shape "shark" set color brown
+  ;set size 3 set shape "shark" set color brown
 end
 
 
 
-to go-one-turn
-  
-  event
-  
-  repeat 150 [ if count preys = 0 or count predators = 0 [game-lost update-plot stop] go]
-  update-plot
+to go-experiment
+  repeat 5000 [ if count preys = 0 or count predators = 0 [stop] go]
   tick
 end
+
 
 
 to go
@@ -107,57 +102,25 @@ to wander
 end
 
 
-to update-plot
-  let t0 (max list 0 (length populations - 500)) let tf length populations
-  ; phase space
-  set-current-plot "phase space"
-  let pops-to-plot sublist populations t0 tf
-  let t 0 foreach pops-to-plot [set-plot-pen-color scale-color black (- t) (- length pops-to-plot) 0 plotxy item 0 ? item 1 ? set t t + 1]
-  
-  ; stocks
-  set pops-to-plot populations set t0 0
-  let turns (list (t0 / 150)) let current-turn t0 / 150 repeat (tf - t0) [set current-turn current-turn + ((tf - t0)/ 150) set turns lput current-turn turns]
-  set-current-plot "stocks"
-  clear-plot set-current-plot-pen "preys" plot-pen-up plotxy first turns first first pops-to-plot plot-pen-down
-  let i 0 foreach pops-to-plot [plotxy item i turns first ? set i i + 1]
-  set-current-plot-pen "predators" plot-pen-up plotxy first turns last first pops-to-plot plot-pen-down
-  set i 0 foreach pops-to-plot [plotxy item i turns last ? set i i + 1]
+
+to-report trajectory [species]
+  ifelse species < length first populations [
+    let res (word "" item species first populations)
+    foreach but-first populations [
+      set res (word res "-" (item species ?))
+    ]
+    report res
+  ][report ""]
 end
-
-
-to game-lost
-  user-message "The ecosystem collapsed - game is lost !"
-end
-
-
-to event
-  if random 10 <= 2 [
-    let delta-x -20 + random 40 let delta-y -20 + random 40
-    user-message (word "Event : " delta-x " preys ; " delta-y " predators")
-    ifelse delta-x > 0 [create-preys delta-x [setxy random-xcor random-ycor new-prey]][ask n-of (min list count preys abs delta-x) preys [die]]
-    ifelse delta-y > 0 [create-predators delta-y [setxy random-xcor random-ycor new-predator]][ask n-of (min list count predators abs delta-y) predators [die]]
-  ]
-end
-
-to action-prey
-  let delta-reprod (read-from-string user-input "Change reproduction (%) : " ) / 100
-  set prey-reproduction prey-reproduction + delta-reprod
-end
-
-to action-predator
-  let delta-carrying (read-from-string user-input "Change survival (%) : ") / 100
-  set predator-carrying predator-carrying + delta-carrying
-end
-
 
 
 
 @#$#@#$#@
 GRAPHICS-WINDOW
-665
-20
-1323
-699
+21
+10
+679
+689
 40
 40
 8.0
@@ -179,111 +142,6 @@ GRAPHICS-WINDOW
 1
 ticks
 30.0
-
-PLOT
-17
-53
-336
-352
-phase space
-preys
-predators
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" "plotxy count preys count predators"
-PENS
-"default" 1.0 0 -16777216 true "" ""
-
-PLOT
-22
-392
-412
-614
-stocks
-turns
-stocks
-0.0
-10.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"preys" 1.0 0 -7500403 true "" ""
-"predators" 1.0 0 -8431303 true "" ""
-
-BUTTON
-400
-37
-495
-70
-New Game
-setup
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-402
-106
-497
-141
-One Turn
-go-one-turn
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-404
-167
-531
-200
-Action Prey
-action-prey
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-403
-206
-531
-239
-Action Predator
-action-predator
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 @#$#@#$#@
 ## WHAT IS IT?
