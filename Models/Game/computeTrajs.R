@@ -17,3 +17,4 @@ for(prelevementProba in c(0.6,0.8,1.0)){for(predatorCarrying in c(0.01,0.015,0.0
   traj0 = trajs[,c(2,1)]
   save(trajx,trajy,traj0,file=paste0(fileprefix,'.RData'))
 }}}
+
