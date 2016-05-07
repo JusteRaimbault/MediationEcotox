@@ -14,11 +14,11 @@ resdir = paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Results/Game/')
 #resfiles = list.files(path=resdir)
 
 # parameter def
-#for(prelevementProba in c(0.6,0.8,1.0)){for(predatorCarrying in c(0.01,0.015,0.02)){for(preyReproduction in c(0.01,0.015,0.02)){
+for(prelevementProba in c(0.6,0.8,1.0)){for(predatorCarrying in c(0.01,0.015,0.02)){for(preyReproduction in c(0.01,0.015,0.02)){
   
-  prelevementProba = 0.6
-  predatorCarrying = 0.01
-  preyReproduction = 0.01
+  #prelevementProba = 0.6
+  #predatorCarrying = 0.01
+  #preyReproduction = 0.01
   
   #res = getTrajs(list(prelevementProba=prelevementProba,predatorCarrying=predatorCarrying,preyReproduction=preyReproduction,filetype='.RData'),datadir,FALSE)
   #trajx = res$trajx;trajy=res$trajy;trajs=res$trajs;rm(res)
@@ -50,7 +50,7 @@ resdir = paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Results/Game/')
   
   
   # try better representation with speed field
-  step=20;
+  step=40;
   x=seq(from=step/2,to=1600,by=step)
   y=seq(from=step/2,to=1600,by=step)
   
@@ -113,6 +113,6 @@ resdir = paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Results/Game/')
   
   
   
-#}}}
+}}}
 
 
