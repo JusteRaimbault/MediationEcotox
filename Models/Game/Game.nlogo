@@ -183,7 +183,6 @@ to action-predator
   ]
 end
 
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 665
@@ -326,7 +325,7 @@ level
 level
 1
 5
-5
+1
 1
 1
 NIL
