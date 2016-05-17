@@ -1,7 +1,7 @@
 
 # Phase space / Liapounov phase diagram for Prey Predator model
 
-setwd(paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Models/Game'))
+#setwd(paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Models/Game'))
 
 library(dplyr)
 library(ggplot2)
@@ -10,7 +10,8 @@ source('functions.R')
 
 #datadir = '/Volumes/Data/ComplexSystems/MediationEcotox/Results/Game/20160427_LHSGRID/split/'
 datadir='/mnt/volume1/juste/ComplexSystems/MediationEcotox/Results/Game/20160427_LHSGRID/split/'
-resdir = paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Results/Game/')
+#resdir = paste0(Sys.getenv('CS_HOME'),'/MediationEcotox/Results/Game/')
+resdir = '/home/juste/ComplexSystems/MediationEcotox/Results/Game/'
 #resfiles = list.files(path=resdir)
 
 # parameter def
@@ -71,41 +72,44 @@ for(prelevementProba in c(0.6,0.8,1.0)){for(predatorCarrying in c(0.01,0.015,0.0
      }
    }}
   
-  g=ggplot(data.frame(x=xcors,y=ycors,xs=xspeed,ys=yspeed),aes(x=x,y=y))+geom_segment(aes(xend = x + xs, yend = y+ys,colour=abs(xs)+abs(ys)),
-                 arrow = arrow(length = unit(0.1,"cm")))+ scale_colour_gradient(low="green",high="red")
+  df = data.frame(x=xcors,y=ycors,xs=xspeed,ys=yspeed)
+  save(df,file=paste0(resfile,'_speeds.RData'))
+
+ # g=ggplot(data.frame(x=xcors,y=ycors,xs=xspeed,ys=yspeed),aes(x=x,y=y))+geom_segment(aes(xend = x + xs, yend = y+ys,colour=abs(xs)+abs(ys)),
+   #              arrow = arrow(length = unit(0.1,"cm")))+ scale_colour_gradient(low="green",high="red")
   #+ theme(axis.ticks = element_line(linetype = "dashed"), 
   #  plot.background = element_rect(fill = "white"), 
   #  legend.position = "bottom", legend.direction = "horizontal")
   
-  ggsave(filename=paste0(resfile,'_speed.png'))
+  #ggsave(filename=paste0(resfile,'_speed.png'))
 
   
   
   ###
   #  pseudo liapounov : MSE trajs from a given cell
   
-  step=10
-  x=seq(from=step/2,to=300,by=step)
-  y=seq(from=step/2,to=300,by=step)
-  liap = c()
-  trajdiff = function(t1,t2){
-    if(length(t1)>length(t2)){tt1=t1;tt2=append(t2,rep(t2[length(t2)],(length(t1)-length(t2))))}else{tt1=t2;tt2=append(t1,rep(t1[length(t1)],(length(t2)-length(t1))))}
-    return(sum((tt1-tt2)^2))
-  }
-  xcors=c();ycors=c()
-  for(xx in x){for (yy in y){
-    rows = (abs(traj0[,1]-xx)<step/2)&(abs(traj0[,2]-yy)<step/2)
-    mse = 0
-    for(k1 in which(rows)){# do it dirty
-      for(k2 in which(rows)){
-        mse = mse + trajdiff(trajx[[k1]],trajx[[k2]])+trajdiff(trajy[[k1]],trajy[[k2]])
-      }
-    }
-    xcors=append(xcors,xx);ycors=append(ycors,yy);liap=append(liap,mse)
-  }}
+ # step=10
+ # x=seq(from=step/2,to=300,by=step)
+ # y=seq(from=step/2,to=300,by=step)
+ # liap = c()
+ # trajdiff = function(t1,t2){
+ #   if(length(t1)>length(t2)){tt1=t1;tt2=append(t2,rep(t2[length(t2)],(length(t1)-length(t2))))}else{tt1=t2;tt2=append(t1,rep(t1[length(t1)],(length(t2)-length(t1))))}
+ #   return(sum((tt1-tt2)^2))
+ # }
+ # xcors=c();ycors=c()
+ # for(xx in x){for (yy in y){
+ #   rows = (abs(traj0[,1]-xx)<step/2)&(abs(traj0[,2]-yy)<step/2)
+ #   mse = 0
+ #   for(k1 in which(rows)){# do it dirty
+ #     for(k2 in which(rows)){
+ #       mse = mse + trajdiff(trajx[[k1]],trajx[[k2]])+trajdiff(trajy[[k1]],trajy[[k2]])
+ #     }
+ #   }
+ #   xcors=append(xcors,xx);ycors=append(ycors,yy);liap=append(liap,mse)
+ # }}
   
-  g=ggplot(data.frame(x=xcors,y=ycors,liap=liap))+geom_raster(aes(x=x,y=y,fill=liap))+ scale_fill_gradient(low="yellow",high="red")
-  ggsave(filename=paste0(resfile,'_liap.png'))
+ # g=ggplot(data.frame(x=xcors,y=ycors,liap=liap))+geom_raster(aes(x=x,y=y,fill=liap))+ scale_fill_gradient(low="yellow",high="red")
+ # ggsave(filename=paste0(resfile,'_liap.png'))
   
   
   
