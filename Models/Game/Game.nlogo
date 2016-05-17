@@ -131,26 +131,57 @@ end
 
 
 to event
+  ; 1/5 chance for an event
   if random 10 <= 2 [
-    let delta-x -20 + random 40 let delta-y -20 + random 40
-    user-message (word "Event : " delta-x " preys ; " delta-y " predators")
-    ifelse delta-x > 0 [create-preys delta-x [setxy random-xcor random-ycor new-prey]][ask n-of (min list count preys abs delta-x) preys [die]]
-    ifelse delta-y > 0 [create-predators delta-y [setxy random-xcor random-ycor new-predator]][ask n-of (min list count predators abs delta-y) predators [die]]
+    ifelse random 2 = 0 [
+      event-prey 
+    ][
+      event-predator
+    ]
+  ]
+end
+
+to event-prey
+  ; draw positive or negative event here
+  let delta-x (random 20 * level) + 1
+  ifelse random 2 = 0 [
+    user-message (word "Event : Migration, " delta-x " preys appear")
+    create-preys delta-x [setxy random-xcor random-ycor new-prey]
+  ][
+    user-message (word "Event : Pollution, " delta-x " preys die from starving")
+    ask n-of (min list (count preys - 10) delta-x) preys [die]
+  ]
+end
+
+to event-predator
+  let delta-y random (20 * level) + 1
+  ifelse random 2 = 0 [
+    user-message (word "Event : Invasion, " delta-y " predators appear")
+    create-predators delta-y [setxy random-xcor random-ycor new-predator]
+  ][
+    user-message (word "Event : Fishing contest, " delta-y " predators die")
+    ask n-of (min list (count predators - 10)  delta-y) predators [die]
   ]
 end
 
 to action-prey
-  let delta-reprod (read-from-string user-input "Change reproduction (%) : " ) / 100
-  set prey-reproduction prey-reproduction + delta-reprod
+  let delta-reprod (read-from-string user-input "Change reproduction (+/- %) : " ) / 100
+  set prey-reproduction prey-reproduction * (1 + delta-reprod)
 end
 
 to action-predator
-  let delta-carrying (read-from-string user-input "Change survival (%) : ") / 100
-  set predator-carrying predator-carrying + delta-carrying
+  ifelse user-one-of "Type of action" ["Change Hunting behavior" "Change survival behavior"] = "Change Hunting behavior" [
+    let delta-prelevement (read-from-string user-input "Change hunting (%) : ") / 100
+    ifelse prelevement-proba = 1 and delta-prelevement > 0 [
+      user-message "Already at maximal capacity"
+    ][
+      set prelevement-proba min list 1 (prelevement-proba * (1 + delta-prelevement))
+    ]
+  ][
+    let delta-carrying (read-from-string user-input "Change survival (%) : ") / 100
+    set predator-carrying predator-carrying * (1 + delta-carrying)
+  ]
 end
-
-
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -181,10 +212,10 @@ ticks
 30.0
 
 PLOT
-17
-53
-336
-352
+24
+52
+343
+351
 phase space
 preys
 predators
@@ -218,10 +249,10 @@ PENS
 "predators" 1.0 0 -8431303 true "" ""
 
 BUTTON
-400
-37
-495
-70
+401
+98
+496
+131
 New Game
 setup
 NIL
@@ -235,10 +266,10 @@ NIL
 1
 
 BUTTON
-402
-106
-497
-141
+403
+167
+498
+202
 One Turn
 go-one-turn
 NIL
@@ -252,10 +283,10 @@ NIL
 1
 
 BUTTON
-404
-167
-531
-200
+405
+228
+532
+261
 Action Prey
 action-prey
 NIL
@@ -269,10 +300,10 @@ NIL
 1
 
 BUTTON
-403
-206
-531
-239
+404
+267
+532
+300
 Action Predator
 action-predator
 NIL
@@ -284,6 +315,43 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+397
+52
+569
+85
+level
+level
+1
+5
+1
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+22
+629
+74
+674
+preys
+count preys
+17
+1
+11
+
+MONITOR
+88
+630
+156
+675
+predators
+count predators
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
