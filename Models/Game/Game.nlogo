@@ -182,7 +182,6 @@ to action-predator
     set predator-carrying predator-carrying * (1 + delta-carrying)
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 665
@@ -325,7 +324,7 @@ level
 level
 1
 5
-1
+4
 1
 1
 NIL
