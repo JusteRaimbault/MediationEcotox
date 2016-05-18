@@ -1,0 +1,61 @@
+\input{header.tex}
+
+
+\title{Title\bigskip\\
+\textit{Working Paper}
+}
+\author{\noun{Juste Raimbault}}
+\date{Date}
+
+
+\maketitle
+
+\justify
+
+
+\begin{abstract}
+
+\end{abstract}
+
+
+
+
+
+\section*{Model Description}
+
+\paragraph{Initial configuration}
+
+
+
+\paragraph{Dynamics}
+
+We denote by $\tau$ the duration of a time step. At each time step, following events sequentially take place.
+
+\begin{itemize}
+\item Fishes move by random steering : each fishes chooses an uniform random heading and go forward (in the two dimensional vertical space) of $d_w$ spatial units if the destination position lays in their authorized area (\textit{no species spacial constraint implemented for now}). Their energy is correspondingly updated by $E=E - d_w \cdot c_w$ where $c_w$ is a wandering cost (energy per spatial unit). Note that this cost captures other ``life costs'' that are not taken into account in other actions such as reproduction.
+\item Moving ressources wander the same way. \textit{not implemented yet}
+\item Fishes eat according to trophic matrices : ressources potentially eaten by a species are effectively eaten if they are within a radius $r_r$ ; fishes within a radius $r_f$
+\item Fishes do reproduce : potential mates are search for within $r_f$, reproduction is done at a cost $c_r$
+\item Fishes with negative energy or too old die 
+\end{itemize}
+
+
+
+
+
+\paragraph{Parameter space}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%% Biblio
+%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{apalike}
+\bibliography{/Users/Juste/Documents/ComplexSystems/CityNetwork/Biblio/Bibtex/CityNetwork}
+
+
+\end{document}
