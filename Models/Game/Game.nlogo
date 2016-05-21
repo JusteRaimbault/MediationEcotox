@@ -324,7 +324,7 @@ level
 level
 1
 5
-4
+1
 1
 1
 NIL
@@ -355,39 +355,44 @@ count predators
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+ - This game aims to illustrate basic concepts of population dynamics in ecology, with the example of a prey-predator freshwater ecosystem.
 
-## HOW IT WORKS
+ - It is flexible and can be played with one or more players.
 
-(what rules the agents use to create the overall behavior of the model)
 
-## HOW TO USE IT
+## HOW TO PLAY
 
-(how to use the model, including a description of each of the items in the Interface tab)
+ - The aim of the game is to maintain the ecosystem so it does not collapse (disparition of a species). The final score is given by the total duration of the game.
 
-## THINGS TO NOTICE
+During one turn : 
 
-(suggested things for the user to notice while running the model)
+ - Populations evolve following rule of an underlying model. Trajectories of populations for the two species are given in `phase space` plot and `stocks` plot.
 
-## THINGS TO TRY
+ - External events can randomly occur, and perturbate the ecosystem (death/birth of prey/predators). Difficulty of the game (cursor `level`) is taken into account at this stage and influence the strength of the event.
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+ - The player(s) can then take actions to adapt dynamics to the current trajectory and stabilize the ecosystem. A single player can choose species taking the actions, whereas more player would have each a species assigned. Possible actions are : for preys, modification of the reproduction rate (+/- in %) ; for predators, modification of survival rate (+/- in %) or modification of hunting rate (catching rate stays however conditioned to random encounters between preys and predators).
 
-## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+## ECOSYSTEM RULES
 
-## NETLOGO FEATURES
+Endogeneous evolution of the ecosystem has the following rules : 
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+ - each prey reproduces with a chance given by reproduction rate
 
-## RELATED MODELS
+ - each predators dies with a chance given by predator survival rate
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+ - agents move randomly (smoothed brownians : heading is sligthly changed and the agent makes one step forward)
+
+ - if a predator encounters a prey, the second is eaten with a chance given by the hunting rate. In this case, the predators reproduces
+
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Serra H. and Raimbault J. (2016). Game-based tools to transmit freshwater ecology concepts, poster to be presented at SETAC 2016, Nantes.
+
+Project repository at https://github.com/JusteRaimbault/MediationEcotox
+
+Online version of the game available at [forthcoming]
 @#$#@#$#@
 default
 true
