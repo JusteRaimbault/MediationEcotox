@@ -11,6 +11,11 @@ globals [
   
   populations
   
+  ; convenience vars for i/o -> not needed
+  ;prev-reproduction-rate-variation
+  ;prev-survival-rate-variation
+  ;prev-hunting-rate-variation
+  
 ]
 
 breed [preys prey]
@@ -39,6 +44,10 @@ to setup-globals
   
   set populations []
   
+  ;set prev-reproduction-rate-variation 0
+  ;set prev-survival-rate-variation 0
+  ;set prev-hunting-rate-variation 0
+  
 end
 
 to setup-agents
@@ -66,9 +75,14 @@ end
 
 to go-one-turn
   
+  action
+  
   event
   
-  repeat 150 [ if count preys = 0 or count predators = 0 [game-lost update-plot stop] go]
+  repeat 150 [
+    if count preys = 0 or count predators = 0 [game-lost update-plot stop]
+    go
+  ]
   update-plot
   tick
 end
@@ -77,7 +91,7 @@ end
 to go
   
     ask turtles [
-      wander 
+      wander
     ]
   
     ask preys [
@@ -98,6 +112,8 @@ to go
     ]   
     
     set populations lput (list count preys count predators) populations
+    
+    tick
 end
 
 
@@ -164,43 +180,79 @@ to event-predator
   ]
 end
 
-to action-prey
-  let delta-reprod (read-string user-input "Change reproduction (+/- %) : " ) / 100
-  set prey-reproduction prey-reproduction * (1 + delta-reprod)
+
+
+to action
+  if reproduction-rate-variation != 0 [
+    user-message (word "Change prey reproduction rate : " (sign reproduction-rate-variation) (abs reproduction-rate-variation) " %")
+    set prey-reproduction prey-reproduction * (1 + reproduction-rate-variation / 100)
+    set reproduction-rate-variation 0
+  ]
+  
+  if survival-rate-variation != 0 [
+    user-message (word "Change predator survival rate : " (sign survival-rate-variation) (abs survival-rate-variation) " %")
+    set predator-carrying predator-carrying * (1 + survival-rate-variation / 100)
+    set survival-rate-variation 0
+  ]
+  
+   if hunting-rate-variation != 0 [
+     ifelse prelevement-proba = 1 and hunting-rate-variation > 0 [
+      user-message "Already at maximal hunting capacitty"
+    ][
+      user-message (word "Change predator hunting rate : " (sign hunting-rate-variation) (abs hunting-rate-variation) " %")
+      set prelevement-proba min list 1 (prelevement-proba * (1 + hunting-rate-variation / 100))
+      set hunting-rate-variation 0
+    ]
+    
+  ]
+  
+  
 end
 
-to action-predator
-  ifelse user-one-of "Type of action" ["Change Hunting behavior" "Change survival behavior"] = "Change Hunting behavior" [
-    let delta-prelevement (read-string user-input "Change hunting (%) : ") / 100
-    ifelse prelevement-proba = 1 and delta-prelevement > 0 [
-      user-message "Already at maximal capacity"
-    ][
-      set prelevement-proba min list 1 (prelevement-proba * (1 + delta-prelevement))
-    ]
-  ][
-    let delta-carrying (read-string user-input "Change survival (%) : ") / 100
-    set predator-carrying predator-carrying * (1 + delta-carrying)
-  ]
+to-report sign [var]
+  ifelse var > 0 [report "+ "][report "- "]
 end
+
+;;
+; unimplemented primitive user-input for NLWeb
+;  -> replace user action by variation sliders
+
+;to action-prey
+;  let delta-reprod (read-string user-input "Change reproduction (+/- %) : " ) / 100
+;  set prey-reproduction prey-reproduction * (1 + delta-reprod)
+;end
+;
+;to action-predator
+;  ifelse user-one-of "Type of action" ["Change Hunting behavior" "Change survival behavior"] = "Change Hunting behavior" [
+;    let delta-prelevement (read-string user-input "Change hunting (%) : ") / 100
+;    ifelse prelevement-proba = 1 and delta-prelevement > 0 [
+;      user-message "Already at maximal capacity"
+;    ][
+;      set prelevement-proba min list 1 (prelevement-proba * (1 + delta-prelevement))
+;    ]
+;  ][
+;    let delta-carrying (read-string user-input "Change survival (%) : ") / 100
+;    set predator-carrying predator-carrying * (1 + delta-carrying)
+;  ]
+;end
 
 
 ;;
 ; dirty handmade read-from-string as not implemented in netlogoweb
-to-report read-string [s]
-  let n length s let i 0 let res 0
-  repeat n [
-    set res (res * 10) + read-digit item i s 
-    set i i + 1 
-  ]  
-  report res
-end
-
-;;
-; the dirty part
-to-report read-digit [d]
-  if d = "0" [report 0] if d = "1" [report 1] if d = "2" [report 2] if d = "3" [report 3] if d = "4" [report 4] if d = "5" [report 5] if d = "6" [report 6] if d = "7" [report 7] if d = "8" [report 8] if d = "9" [report 9]
-end
-
+;to-report read-string [s]
+;  let n length s let i 0 let res 0
+;  repeat n [
+;    set res (res * 10) + read-digit item i s 
+;    set i i + 1 
+;  ]  
+;  report res
+;end
+;
+;;;
+;; the dirty part
+;to-report read-digit [d]
+;  if d = "0" [report 0] if d = "1" [report 1] if d = "2" [report 2] if d = "3" [report 3] if d = "4" [report 4] if d = "5" [report 5] if d = "6" [report 6] if d = "7" [report 7] if d = "8" [report 8] if d = "9" [report 9]
+;end
 
 
 
@@ -229,8 +281,8 @@ GRAPHICS-WINDOW
 40
 -40
 40
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -249,15 +301,15 @@ predators
 10.0
 true
 false
-"" "plotxy count preys count predators"
+"" ""
 PENS
 "default" 1.0 0 -16777216 true "" ""
 
 PLOT
-22
-392
-412
-614
+17
+380
+411
+602
 stocks
 turns
 stocks
@@ -306,40 +358,6 @@ NIL
 NIL
 1
 
-BUTTON
-405
-228
-532
-261
-Action Prey
-action-prey
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-404
-267
-532
-300
-Action Predator
-action-predator
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 SLIDER
 397
 52
@@ -373,6 +391,82 @@ MONITOR
 675
 predators
 count predators
+17
+1
+11
+
+TEXTBOX
+424
+220
+574
+238
+Action Prey
+14
+0.0
+1
+
+TEXTBOX
+423
+288
+573
+306
+Action Predator
+14
+0.0
+1
+
+SLIDER
+429
+241
+653
+274
+reproduction-rate-variation
+reproduction-rate-variation
+-100
+100
+0
+5
+1
+(+/- %)
+HORIZONTAL
+
+SLIDER
+430
+313
+656
+346
+survival-rate-variation
+survival-rate-variation
+-100
+100
+0
+5
+1
+(+/- %)
+HORIZONTAL
+
+SLIDER
+430
+350
+656
+383
+hunting-rate-variation
+hunting-rate-variation
+-100
+100
+0
+5
+1
+(+/- %)
+HORIZONTAL
+
+MONITOR
+514
+161
+571
+206
+turn
+floor (ticks / 150)
 17
 1
 11
