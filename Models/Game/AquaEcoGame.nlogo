@@ -9,7 +9,9 @@ globals [
   predator-carrying
   prelevement-proba
   
-  populations
+  begin-tour?
+  
+  ;populations
   
   ; convenience vars for i/o -> not needed
   ;prev-reproduction-rate-variation
@@ -26,11 +28,12 @@ breed [predators predator]
 
 
 to setup
-  ca reset-ticks
+  ca
   setup-globals
   setup-world
   setup-agents
-  setup-plot
+  ;setup-plot
+  reset-ticks
 end
 
 to setup-globals
@@ -42,7 +45,9 @@ to setup-globals
   set initial-predators predator-carrying * sqrt 2 * world-height * world-width / prelevement-proba
   set initial-preys prey-reproduction * sqrt 2 * world-height * world-width / prelevement-proba
   
-  set populations []
+  set begin-tour? true
+  
+  ;set populations []
   
   ;set prev-reproduction-rate-variation 0
   ;set prev-survival-rate-variation 0
@@ -59,9 +64,9 @@ to setup-world
   ask patches [set pcolor blue]
 end
 
-to setup-plot
-  set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
-end
+;to setup-plot
+;  set-current-plot "phase space" plot-pen-up plotxy count preys count predators plot-pen-down
+;end
 
 to new-prey
   set size 2 set shape "fish" set color grey  
@@ -75,16 +80,30 @@ end
 
 to go-one-turn
   
-  action
-  
-  event
-  
-  repeat 150 [
-    if count preys = 0 or count predators = 0 [game-lost update-plot stop]
-    go
+  if begin-tour? [
+    ;show "action"
+    action
+    event
+    set begin-tour? false ;clear-plot
   ]
-  update-plot
-  tick
+  
+  ;repeat 150 [
+  
+  if count preys = 0 or count predators = 0 [
+    game-lost
+    ;update-plot 
+    stop
+  ]
+  
+  go
+  
+  if ticks mod 150 = 0 [
+    set begin-tour? true
+    stop 
+  ]
+  ;]
+  ;update-plot
+  ;tick
 end
 
 
@@ -115,11 +134,17 @@ to go
     ; TODO : reduce memory for populations : only each 5 steps ; and delete older pops than a given number ?
     ;
     
-    if ticks mod 5 = 0 [
-      set populations lput (list count preys count predators) populations
-    ]
+    ; remove populations memorization for performance purposes.
+    ;if ticks mod 5 = 0 [
+    ;  set populations lput (list count preys count predators) populations
+    ;]
     
     tick
+    
+    set-current-plot "phase space"
+    set-current-plot-pen "phase"
+    plotxy count preys count predators
+    
 end
 
 
@@ -129,22 +154,25 @@ to wander
 end
 
 
-to update-plot
-  let t0 (max list 0 (length populations - 300)) let tf length populations
-  ; phase space
-  set-current-plot "phase space"
-  let pops-to-plot sublist populations t0 tf
-  let t 0 foreach pops-to-plot [set-plot-pen-color scale-color black (- t) (- length pops-to-plot) 0 plotxy item 0 ? item 1 ? set t t + 1]
-  
-  ; stocks
-  set pops-to-plot populations set t0 0
-  let turns (list (t0 / 150)) let current-turn t0 / 150 repeat (tf - t0) [set current-turn current-turn + ((tf - t0)/ 150) set turns lput current-turn turns]
-  set-current-plot "stocks"
-  clear-plot set-current-plot-pen "preys" plot-pen-up plotxy first turns first first pops-to-plot plot-pen-down
-  let i 0 foreach pops-to-plot [plotxy item i turns first ? set i i + 1]
-  set-current-plot-pen "predators" plot-pen-up plotxy first turns last first pops-to-plot plot-pen-down
-  set i 0 foreach pops-to-plot [plotxy item i turns last ? set i i + 1]
-end
+
+; beautiful plot update seems to be very slow on client-side processing ; due to memory limitations ?
+;  -> draw only simple plots
+;to update-plot
+;  let t0 (max list 0 (length populations - 300)) let tf length populations
+;  ; phase space
+;  set-current-plot "phase space"
+;  let pops-to-plot sublist populations t0 tf
+;  let t 0 foreach pops-to-plot [set-plot-pen-color scale-color black (- t) (- length pops-to-plot) 0 plotxy item 0 ? item 1 ? set t t + 1]
+;  
+;  ; stocks
+;  set pops-to-plot populations set t0 0
+;  let turns (list (t0 / 150)) let current-turn t0 / 150 repeat (tf - t0) [set current-turn current-turn + ((tf - t0)/ 150) set turns lput current-turn turns]
+;  set-current-plot "stocks"
+;  clear-plot set-current-plot-pen "preys" plot-pen-up plotxy first turns first first pops-to-plot plot-pen-down
+;  let i 0 foreach pops-to-plot [plotxy item i turns first ? set i i + 1]
+;  set-current-plot-pen "predators" plot-pen-up plotxy first turns last first pops-to-plot plot-pen-down
+;  set i 0 foreach pops-to-plot [plotxy item i turns last ? set i i + 1]
+;end
 
 
 to game-lost
@@ -171,7 +199,7 @@ to event-prey
     create-preys delta-x [setxy random-xcor random-ycor new-prey]
   ][
     user-message (word "Event : Pollution, " delta-x " preys die from starving")
-    ask n-of (min list (count preys - 10) delta-x) preys [die]
+    ask n-of (min list (max list 0 (count preys - 10)) delta-x) preys [die]
   ]
 end
 
@@ -182,7 +210,7 @@ to event-predator
     create-predators delta-y [setxy random-xcor random-ycor new-predator]
   ][
     user-message (word "Event : Fishing contest, " delta-y " predators die")
-    ask n-of (min list (count predators - 10)  delta-y) predators [die]
+    ask n-of (min list (max list 0 (count predators - 10))  delta-y) predators [die]
   ]
 end
 
@@ -264,16 +292,15 @@ end
 
 
 
-
 @#$#@#$#@
 GRAPHICS-WINDOW
-665
-20
-1323
-699
+605
+29
+1211
+656
 40
 40
-8.0
+7.36
 1
 10
 1
@@ -294,10 +321,10 @@ ticks
 30.0
 
 PLOT
-24
-52
-343
-351
+35
+330
+302
+579
 phase space
 preys
 predators
@@ -309,13 +336,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" ""
+"phase" 1.0 0 -13360827 true "" ""
 
 PLOT
-17
-380
-411
-602
+3
+29
+414
+272
 stocks
 turns
 stocks
@@ -327,14 +354,14 @@ true
 true
 "" ""
 PENS
-"preys" 1.0 0 -7500403 true "" ""
-"predators" 1.0 0 -8431303 true "" ""
+"preys" 1.0 0 -7500403 true "" "plot count preys"
+"predators" 1.0 0 -8431303 true "" "plot count predators"
 
 BUTTON
-401
-98
-496
-131
+431
+86
+526
+119
 New Game
 setup
 NIL
@@ -348,13 +375,13 @@ NIL
 1
 
 BUTTON
-403
-167
-498
-202
+429
+162
+524
+197
 One Turn
 go-one-turn
-NIL
+T
 1
 T
 OBSERVER
@@ -365,10 +392,10 @@ NIL
 1
 
 SLIDER
-397
-52
-569
-85
+427
+40
+599
+73
 level
 level
 1
@@ -380,10 +407,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-22
-629
-74
-674
+423
+229
+488
+274
 preys
 count preys
 17
@@ -391,10 +418,10 @@ count preys
 11
 
 MONITOR
-88
-630
-156
-675
+502
+228
+565
+273
 predators
 count predators
 17
@@ -402,30 +429,30 @@ count predators
 11
 
 TEXTBOX
-424
-220
-574
-238
+336
+312
+486
+330
 Action Prey
 14
 0.0
 1
 
 TEXTBOX
-423
-288
-573
-306
+335
+380
+485
+398
 Action Predator
 14
 0.0
 1
 
 SLIDER
-429
-241
-653
-274
+341
+333
+565
+366
 reproduction-rate-variation
 reproduction-rate-variation
 -100
@@ -437,10 +464,10 @@ reproduction-rate-variation
 HORIZONTAL
 
 SLIDER
-430
-313
-656
-346
+342
+405
+568
+438
 survival-rate-variation
 survival-rate-variation
 -100
@@ -452,10 +479,10 @@ survival-rate-variation
 HORIZONTAL
 
 SLIDER
-430
-350
-656
-383
+342
+442
+568
+475
 hunting-rate-variation
 hunting-rate-variation
 -100
@@ -467,15 +494,52 @@ hunting-rate-variation
 HORIZONTAL
 
 MONITOR
-514
-161
-571
-206
+540
+156
+597
+201
 turn
 floor (ticks / 150)
 17
 1
 11
+
+TEXTBOX
+424
+129
+603
+155
+----------------------------
+10
+0.0
+1
+
+TEXTBOX
+422
+209
+606
+235
+-----------------------------
+10
+0.0
+1
+
+BUTTON
+16
+281
+114
+314
+Clear plots
+clear-all-plots
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -517,7 +581,7 @@ Serra H. and Raimbault J. (2016). Game-based tools to transmit freshwater ecolog
 
 Project repository at https://github.com/JusteRaimbault/MediationEcotox
 
-Online version of the game available at [forthcoming]
+Online version of the game available at http://aquaecogames.org
 @#$#@#$#@
 default
 true
